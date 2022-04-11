@@ -110,7 +110,7 @@ class SnakeGame:
         i, j = self.snake[0][0] + direc[0], self.snake[0][1] + direc[1]
         if self.map[i][j] == 2: # food
             grow = True
-            reward += 10
+            reward += 100
             self._set_food()
         elif self.map[i][j] == 1 or self.map[i][j] == 3: # snake of obstacle
             reward -= 100

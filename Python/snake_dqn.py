@@ -37,7 +37,7 @@ class DQNAgent:
         self.discount_factor = 0.99
         self.learning_rate = 0.001
         self.epsilon = 1.0
-        self.epsilon_decay = 0.999
+        self.epsilon_decay = 0.9995
         self.epsilon_min = 0.01
         self.batch_size = 64
         self.train_start = 1000
@@ -95,8 +95,6 @@ class DQNAgent:
 
     # 리플레이 메모리에서 무작위로 추출한 배치로 모델 학습
     def train_model(self):
-        if self.epsilon > self.epsilon_min:
-            self.epsilon *= self.epsilon_decay
 
         # 메모리에서 배치 크기만큼 무작위로 샘플 추출
         batch = random.sample(self.memory, self.batch_size)
@@ -151,7 +149,7 @@ class DQNAgent:
 # In[5]:
 
 
-EPISODES = 500
+EPISODES = 100000
 
 env = SnakeGame()
 state_size = env.state_size
@@ -166,8 +164,8 @@ for e in range(EPISODES):
     state = env.reset()
     
     while not done:
-        if e % 10 == 0:
-            env.render()
+        # if e % 1000 == 0:
+            # env.render()
         
         # state = torch.FloatTensor([state]) # 이렇게 하면 느리다고 워닝뜸
         state = torch.FloatTensor(np.array([state]))
@@ -187,7 +185,16 @@ for e in range(EPISODES):
             scores.append(score)
             episodes.append(e)
             pylab.plot(episodes, scores, 'b')
-            pylab.savefig('./snake_dqn.png')
+            pylab.savefig('./Python/snake_dqn.png')
             print("episode:", e, "  score:", score, "  memory length:",
                       len(agent.memory), "  epsilon:", agent.epsilon)
+            
+            if agent.epsilon > agent.epsilon_min:
+                agent.epsilon *= agent.epsilon_decay
+            
+            if score >= 100:
+                torch.save(agent.model.state_dict(),
+                                "./Python/lunarlander_dqn.bin")
+                print('get it!')
+                break
 
