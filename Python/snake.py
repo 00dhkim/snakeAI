@@ -9,6 +9,7 @@ snake 게임의 기능을 담은 소스코드
 import os
 import random
 import numpy as np
+import time
 
 MAP_SIZE = 10
 
@@ -42,6 +43,7 @@ class SnakeGame:
 
     
     def reset(self):
+        random.seed(411)
         self.snake = [[0, 0]]
         self.map = np.zeros((MAP_SIZE, MAP_SIZE), dtype=np.int32)
         
@@ -90,7 +92,7 @@ class SnakeGame:
         그 후, 이동
         """
         reward = 0
-        # reward = -1 # 움직이기만 해도 -1
+        reward = -1 # 움직이기만 해도 -1
         done = False
         grow = False
         
@@ -125,6 +127,7 @@ class SnakeGame:
 
 
     def render(self):
+        time.sleep(0.1)
         _ = os.system('cls' if os.name == 'nt' else 'clear')
         
         for i in range(MAP_SIZE):
