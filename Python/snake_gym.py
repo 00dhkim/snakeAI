@@ -76,7 +76,7 @@ class SnakeGym:
         - alive : +1
         - dead  : -100
         '''
-        self.state_size = map_size * map_size * 4 # num. of labels
+        self.state_size = map_size * map_size * 3 # num. of channels
         self.action_size = 4
         self.map_size = map_size
         self.episode_len = 0
