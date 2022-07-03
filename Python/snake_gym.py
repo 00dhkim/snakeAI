@@ -59,7 +59,7 @@ class SnakeGym:
     def __init__(self, map_size=MAP_SIZE):
         '''
         rewarda
-        -  +10: eat food
+        -   +1: eat food
         - -100: dead
         -   -1: move
         '''
@@ -143,7 +143,7 @@ class SnakeGym:
         
         if self.map[i][j] == self.FOOD: # FOOD
             grow = True
-            reward += 10
+            reward += 1
             self.foods.remove((i, j))
             self._set_food()
         elif self.map[i][j] == self.SNAKE or self.map[i][j] == self.WALL: # SNAKE of WALL
@@ -160,10 +160,20 @@ class SnakeGym:
         return self._get_state(), reward, done, {}
     
     def _get_state(self):
-        # TODO: np.array(map_size[0], map_size[1], 2), 0번은 food, 1번은 snake
-        # TODO: 만약 나중에 random wall이 추가된다면, 1번 자리에 추가, snake 여러개 된다면 2번부터 이어서 추가
+        # 3 channels, 1 channel for each snake, food, wall
+        state = np.zeros((3, self.map_size, self.map_size), dtype=np.int32)
         
-        return self.map.copy().flatten()
+        for i in range(self.map_size):
+            for j in range(self.map_size):
+                if self.map[i][j] == self.SNAKE:
+                    state[0][i][j] = 1
+                elif self.map[i][j] == self.FOOD:
+                    state[1][i][j] = 1
+                elif self.map[i][j] == self.WALL:
+                    state[2][i][j] = 1
+        
+        # return self.map.copy().flatten()
+        return state.copy()
     
     def render(self):
         _ = os.system('cls' if os.name == 'nt' else 'clear')
