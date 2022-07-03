@@ -9,6 +9,7 @@ snake 게임의 플레이 기능 담은 소스코드
 import os
 import random
 from tkinter import LEFT
+from tracemalloc import start
 import numpy as np
 
 MAP_SIZE = 10
@@ -20,15 +21,17 @@ class Snake:
     locations: [(int, int)]
         snake 위치를 나타내는 리스트, (i, j)
     
+    health: int
+        100으로 초기화, 매 step -1, 0이 되면 사망
+    
     map_size: int
     '''
 
     def __init__(self, map_size, starting_pos=(0, 0)):
+        self.map_size = map_size
         self.locations = []  # locations[0]: head
         self.locations.append(starting_pos)
-        self.is_alive = True
-        self.ate_food = False
-        self.map_size = map_size
+        self.health = 100
 
     def insert_head(self, pos):
         self.locations.insert(0, pos)
@@ -38,6 +41,16 @@ class Snake:
     
     def head_pos(self):
         return self.locations[0]
+    
+    def health_decrease(self):
+        self.health -= 1
+        if self.health <= 0: # dead
+            return 'dead'
+        else:
+            return self.health
+    
+    def heal(self):
+        self.health = 100
     
     # def __getitem__(self, index):
     #     return self.locations[index]
@@ -57,23 +70,28 @@ class SnakeGym:
     WALL = 3
 
     def __init__(self, map_size=MAP_SIZE):
+        '''TODO:
+        rewards
+        - eat   : 0
+        - alive : +1
+        - dead  : -100
         '''
-        rewarda
-        -   +1: eat food
-        - -100: dead
-        -   -1: move
-        '''
-        self.state_size = map_size * map_size
+        self.state_size = map_size * map_size * 4 # num. of labels
         self.action_size = 4
         self.map_size = map_size
+        self.episode_len = 0
+        self.eat_cnt = 0
 
-        self.snake = None  # Snake class
+        self.snake = Snake(map_size=map_size) # Snake class
         self.foods = []  # [(int, int)]
         self.map = None  # [(int, int)]
 
     def reset(self):
+        self.episode_len = 0
+        self.eat_cnt = 0
         starting_pos = (random.randint(1, self.map_size - 2), random.randint(1, self.map_size - 2))
         
+        del self.snake
         self.snake = Snake(map_size=self.map_size,
                            starting_pos=starting_pos)
         self.map = np.zeros((self.map_size, self.map_size), dtype=np.int32)
@@ -110,8 +128,7 @@ class SnakeGym:
         랜덤 위치에 장애물을 둠, 처음에만 수행
         """
         while True:
-            i, j = random.randint(
-                1, self.map_size - 2), random.randint(1, self.map_size - 2)
+            i, j = random.randint(1, self.map_size - 2), random.randint(1, self.map_size - 2)
             if self.map[i][j] == 0:
                 break
         self.map[i][j] = 3
@@ -123,8 +140,8 @@ class SnakeGym:
         - 먹이가 있다면, 성장
         그 후, 이동
         """
-        reward = 0
-        # reward = -1 # 움직이기만 해도 -1
+        self.episode_len += 1
+        reward = 1
         done = False
         grow = False
 
@@ -141,23 +158,32 @@ class SnakeGym:
 
         i, j = self.snake.head_pos()[0] + direc[0], self.snake.head_pos()[1] + direc[1]
         
-        if self.map[i][j] == self.FOOD: # FOOD
+        if self.snake.health_decrease() == 'dead': # 체력 없다면
+            done = True
+            reward -= 100
+        elif self.map[i][j] == self.FOOD: # FOOD 먹었다면
             grow = True
             reward += 1
             self.foods.remove((i, j))
             self._set_food()
-        elif self.map[i][j] == self.SNAKE or self.map[i][j] == self.WALL: # SNAKE of WALL
+            self.snake.heal()
+            self.eat_cnt += 1
+        elif self.map[i][j] == self.SNAKE or self.map[i][j] == self.WALL: # SNAKE 또는 WALL 부딪혔다면
             reward -= 100
             done = True
 
-        # update snake
+        # update snake coordinates
         self.snake.insert_head((i, j))
         self.map[i][j] = self.SNAKE
         if not grow:
             i, j = self.snake.pop_tail()
             self.map[i][j] = 0
 
-        return self._get_state(), reward, done, {}
+        return self._get_state(), reward, done, {'episode_length': self.episode_len,
+                                                 'snake_length': self.snake.locations.__len__(),
+                                                 'snake_health': self.snake.health,
+                                                 'eat_cnt': self.eat_cnt,
+                                                 }
     
     def _get_state(self):
         # 3 channels, 1 channel for each snake, food, wall
