@@ -11,6 +11,7 @@ import random
 from tkinter import LEFT
 from tracemalloc import start
 import numpy as np
+import time
 
 MAP_SIZE = 10
 
@@ -79,7 +80,7 @@ class SnakeGym:
         self.state_size = map_size * map_size * 3 # num. of channels
         self.action_size = 4
         self.map_size = map_size
-        self.episode_len = 0
+        self.step_len = 0
         self.eat_cnt = 0
 
         self.snake = Snake(map_size=map_size) # Snake class
@@ -87,7 +88,7 @@ class SnakeGym:
         self.map = None  # [(int, int)]
 
     def reset(self):
-        self.episode_len = 0
+        self.step_len = 0
         self.eat_cnt = 0
         starting_pos = (random.randint(1, self.map_size - 2), random.randint(1, self.map_size - 2))
         
@@ -140,7 +141,7 @@ class SnakeGym:
         - 먹이가 있다면, 성장
         그 후, 이동
         """
-        self.episode_len += 1
+        self.step_len += 1
         reward = 1
         done = False
         grow = False
@@ -163,7 +164,8 @@ class SnakeGym:
             reward -= 100
         elif self.map[i][j] == self.FOOD: # FOOD 먹었다면
             grow = True
-            reward += 1
+            # reward += 1
+            reward += 0 # 일단 살아있는 모델부터 만들어보자. 지금은 자꾸 죽어버림.
             self.foods.remove((i, j))
             self._set_food()
             self.snake.heal()
@@ -179,7 +181,7 @@ class SnakeGym:
             i, j = self.snake.pop_tail()
             self.map[i][j] = 0
 
-        return self._get_state(), reward, done, {'episode_length': self.episode_len,
+        return self._get_state(), reward, done, {'step_length': self.step_len,
                                                  'snake_length': self.snake.locations.__len__(),
                                                  'snake_health': self.snake.health,
                                                  'eat_cnt': self.eat_cnt,
@@ -201,7 +203,7 @@ class SnakeGym:
         # return self.map.copy().flatten()
         return state.copy()
     
-    def render(self):
+    def render(self, delay: float = 0.0):
         _ = os.system('cls' if os.name == 'nt' else 'clear')
 
         for i in range(self.map_size):
@@ -215,6 +217,9 @@ class SnakeGym:
                 if self.map[i][j] == 3:  # obstacle
                     print('#', end=' ')
             print()
+        
+        if delay:
+            time.sleep(delay)
 
     def _char2idx(self, char):
         if char == 'w':

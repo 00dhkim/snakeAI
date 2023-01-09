@@ -4,7 +4,7 @@
 # In[1]:
 
 
-from snake import SnakeGame
+from snake_gym import SnakeGym
 
 
 # In[2]:
@@ -20,6 +20,7 @@ import torch
 from torch import nn, optim
 import torch.nn.functional as F
 
+import logging
 
 # In[3]:
 
@@ -37,7 +38,7 @@ class DQNAgent:
         self.discount_factor = 0.99
         self.learning_rate = 0.001
         self.epsilon = 1.0
-        self.epsilon_decay = 0.9995
+        self.epsilon_decay = 0.995
         self.epsilon_min = 0.01
         self.batch_size = 64
         self.train_start = 1000
@@ -61,6 +62,7 @@ class DQNAgent:
     # 상태가 입력, 큐함수가 출력인 인공신경망 생성
     def build_model(self):
         model = nn.Sequential(
+            nn.Flatten(),
             nn.Linear(self.state_size, 64),
             nn.ReLU(),
             nn.Linear(64, 64),
@@ -148,15 +150,21 @@ class DQNAgent:
 
 # In[5]:
 
+logging.basicConfig(filename='log.log', level=logging.DEBUG, filemode='w',
+                    format="%(asctime)s %(message)s")
+logging.info('logging start\n')
 
-EPISODES = 100000
 
-env = SnakeGame()
+EPISODES = 1000
+
+env = SnakeGym()
 state_size = env.state_size
 action_size = env.action_size
 
 agent = DQNAgent(state_size, action_size)
 scores, episodes = [], []
+
+delay = 0.0
 
 for e in range(EPISODES):
     done = False
@@ -164,8 +172,8 @@ for e in range(EPISODES):
     state = env.reset()
     
     while not done:
-        # if e % 1000 == 0:
-            # env.render()
+        print(f'episode: {e}')
+        # env.render(delay=delay)
         
         # state = torch.FloatTensor([state]) # 이렇게 하면 느리다고 워닝뜸
         state = torch.FloatTensor(np.array([state]))
@@ -176,6 +184,8 @@ for e in range(EPISODES):
         agent.append_sample(state, action, reward, next_state, done)
         if len(agent.memory) > agent.train_start:
             agent.train_model()
+            # delay = 0.1
+            delay = 0.0
         
         score += reward
         state = next_state
@@ -184,10 +194,11 @@ for e in range(EPISODES):
             agent.update_target_model()
             scores.append(score)
             episodes.append(e)
-            pylab.plot(episodes, scores, 'b')
-            pylab.savefig('./Python/snake_dqn.png')
-            print("episode:", e, "  score:", score, "  memory length:",
-                      len(agent.memory), "  epsilon:", agent.epsilon)
+            # pylab.plot(episodes, scores, 'b')
+            # pylab.savefig('./Python/snake_dqn.png')
+            
+            logging.info(f"episode:{e} score: {score} memory length: "
+                         f"{len(agent.memory)} epsilon: {agent.epsilon}")
             
             if agent.epsilon > agent.epsilon_min:
                 agent.epsilon *= agent.epsilon_decay
