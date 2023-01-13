@@ -24,11 +24,15 @@ import logging
 
 # In[3]:
 
+LOAD_MODEL = False
+RENDER = False
+EPISODES = 10000
+RENDER_DELAY = 0.1
 
 class DQNAgent:
     def __init__(self, state_size, action_size):
-        self.render = False
-        self.load_model = False
+        self.render = RENDER
+        self.load_model = LOAD_MODEL
 
         # 상태와 행동의 크기 정의
         self.state_size = state_size
@@ -36,7 +40,7 @@ class DQNAgent:
 
         # DQN 하이퍼파라미터
         self.discount_factor = 0.99
-        self.learning_rate = 0.001
+        self.learning_rate = 0.01
         self.epsilon = 1.0
         self.epsilon_decay = 0.995
         self.epsilon_min = 0.01
@@ -57,7 +61,7 @@ class DQNAgent:
 
         if self.load_model:
             self.model.load_state_dict(torch.load(
-                './snake_dqn_trained.bin'))
+                './Python/snake_dqn_1.bin'))
     
     # 상태가 입력, 큐함수가 출력인 인공신경망 생성
     def build_model(self):
@@ -154,9 +158,6 @@ logging.basicConfig(filename='log.log', level=logging.DEBUG, filemode='w',
                     format="%(asctime)s %(message)s")
 logging.info('logging start\n')
 
-
-EPISODES = 1000
-
 env = SnakeGym()
 state_size = env.state_size
 action_size = env.action_size
@@ -164,7 +165,7 @@ action_size = env.action_size
 agent = DQNAgent(state_size, action_size)
 scores, episodes = [], []
 
-delay = 0.0
+save_flag_1, save_flag_2 = True, True
 
 for e in range(EPISODES):
     done = False
@@ -172,8 +173,9 @@ for e in range(EPISODES):
     state = env.reset()
     
     while not done:
-        print(f'episode: {e}')
-        # env.render(delay=delay)
+        if RENDER:
+            print(f'episode: {e}')
+            env.render(delay=RENDER_DELAY)
         
         # state = torch.FloatTensor([state]) # 이렇게 하면 느리다고 워닝뜸
         state = torch.FloatTensor(np.array([state]))
@@ -184,8 +186,6 @@ for e in range(EPISODES):
         agent.append_sample(state, action, reward, next_state, done)
         if len(agent.memory) > agent.train_start:
             agent.train_model()
-            # delay = 0.1
-            delay = 0.0
         
         score += reward
         state = next_state
@@ -203,9 +203,23 @@ for e in range(EPISODES):
             if agent.epsilon > agent.epsilon_min:
                 agent.epsilon *= agent.epsilon_decay
             
-            if score >= 100:
+            # 최근 10 에피소드의 점수 평균이 -30 이상일 때 저장
+            if save_flag_1 and np.mean(scores[-min(10, len(scores)):]) > -30:
                 torch.save(agent.model.state_dict(),
-                                "./Python/lunarlander_dqn.bin")
-                print('get it!')
-                break
+                           "./Python/snake_dqn_1.bin")
+                print('model 1 saved at', e)
+                save_flag_1 = False
+            
+            # 최근 10 에피소드의 점수 평균이 10 이상일 때 저장
+            if save_flag_2 and np.mean(scores[-min(10, len(scores)):]) > 10:
+                torch.save(agent.model.state_dict(),
+                           "./Python/snake_dqn_2.bin")
+                print('model 2 saved at', e)
+                save_flag_2 = False
 
+            # 최근 10 에피소드의 점수 평균이 30 이상일 때 종료
+            if np.mean(scores[-min(10, len(scores)):]) > 30:
+                torch.save(agent.model.state_dict(),
+                           "./Python/snake_dqn_3.bin")
+                print('model 3 saved at', e)
+                sys.exit()
