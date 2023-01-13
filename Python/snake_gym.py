@@ -74,7 +74,7 @@ class SnakeGym:
     WALL = 3
 
     def __init__(self, map_size=MAP_SIZE):
-        '''TODO:
+        '''
         rewards
         - eat   : 0
         - alive : +1
@@ -172,7 +172,7 @@ class SnakeGym:
             reward += 0 # 일단 살아있는 모델부터 만들어보자. 지금은 자꾸 죽어버림.
             self.foods.remove((i, j))
             self._set_food()
-            self.snake.heal()
+            # self.snake.heal()
             self.eat_cnt += 1
         elif self.map[i][j] == self.SNAKE or self.map[i][j] == self.WALL: # SNAKE 또는 WALL 부딪혔다면
             reward -= 10
