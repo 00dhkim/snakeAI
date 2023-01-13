@@ -24,6 +24,7 @@ class Snake:
     
     health: int
         100으로 초기화, 매 step -1, 0이 되면 사망
+        TODO: health 개념 비활성화
     
     map_size: int
     '''
@@ -43,15 +44,17 @@ class Snake:
     def head_pos(self):
         return self.locations[0]
     
-    def health_decrease(self):
-        self.health -= 1
-        if self.health <= 0: # dead
-            return 'dead'
-        else:
-            return self.health
+    # TODO: health 개념 비활성화
+    # def health_decrease(self):
+    #     self.health -= 1
+    #     if self.health <= 0: # dead
+    #         return 'dead'
+    #     else:
+    #         return self.health
     
-    def heal(self):
-        self.health = 100
+    # TODO: health 개념 비활성화
+    # def heal(self):
+    #     self.health = 100
     
     # def __getitem__(self, index):
     #     return self.locations[index]
@@ -159,10 +162,11 @@ class SnakeGym:
 
         i, j = self.snake.head_pos()[0] + direc[0], self.snake.head_pos()[1] + direc[1]
         
-        if self.snake.health_decrease() == 'dead': # 체력 없다면
-            done = True
-            reward -= 100
-        elif self.map[i][j] == self.FOOD: # FOOD 먹었다면
+        # TODO: health 개념 비활성화
+        # if self.snake.health_decrease() == 'dead': # 체력 없다면
+        #     done = True
+        #     reward -= 100
+        if self.map[i][j] == self.FOOD: # FOOD 먹었다면
             grow = True
             # reward += 1
             reward += 0 # 일단 살아있는 모델부터 만들어보자. 지금은 자꾸 죽어버림.
