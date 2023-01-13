@@ -45,7 +45,7 @@ class DQNAgent:
         self.discount_factor = 0.99
         self.learning_rate = 0.01
         self.epsilon = 1.0
-        self.epsilon_decay = 0.995
+        self.epsilon_decay = 0.999
         self.epsilon_min = 0.01
         self.batch_size = 64
         self.train_start = 1000
@@ -234,15 +234,15 @@ for e in range(EPISODES):
                 print('model 1 saved at', e)
                 save_flag_1 = False
             
-            # 뱀의 꼬리가 10 이상일 때 저장
-            if save_flag_2 and info['snake_length'] > 10:
+            # 뱀의 꼬리가 5 이상일 때 저장
+            if save_flag_2 and info['snake_length'] > 5:
                 torch.save(agent.model.state_dict(),
                            "./Python/snake_dqn_2.bin")
                 print('model 2 saved at', e)
                 save_flag_2 = False
             
-            # 뱀의 꼬리가 30 이상일 때 종료
-            if info['snake_length'] > 30:
+            # 뱀의 꼬리가 10 이상일 때 종료
+            if info['snake_length'] > 10:
                 torch.save(agent.model.state_dict(),
                            "./Python/snake_dqn_3.bin")
                 print('model 3 saved at', e)

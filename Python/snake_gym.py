@@ -15,6 +15,9 @@ import time
 
 MAP_SIZE = 10
 
+REWARD_EAT = 3 # 길어지도록 유도
+REWARD_ALIVE = 1 # 
+REWARD_DEAD = -10 # 벽이나 몸통에 닿지 않도록 유도
 
 class Snake:
     # single agent now
@@ -72,14 +75,8 @@ class SnakeGym:
     SNAKE = 1
     FOOD = 2
     WALL = 3
-
+    
     def __init__(self, map_size=MAP_SIZE):
-        '''
-        rewards
-        - eat   : 0
-        - alive : +1
-        - dead  : -100
-        '''
         self.state_size = map_size * map_size * 3 # num. of channels
         self.action_size = 4
         self.map_size = map_size
@@ -145,7 +142,7 @@ class SnakeGym:
         그 후, 이동
         """
         self.step_len += 1
-        reward = 1
+        reward = REWARD_ALIVE
         done = False
         grow = False
 
@@ -165,17 +162,16 @@ class SnakeGym:
         # TODO: health 개념 비활성화
         # if self.snake.health_decrease() == 'dead': # 체력 없다면
         #     done = True
-        #     reward -= 100
+        #     reward = REWARD_DEAD
         if self.map[i][j] == self.FOOD: # FOOD 먹었다면
             grow = True
-            # reward += 1
-            reward += 0 # 일단 살아있는 모델부터 만들어보자. 지금은 자꾸 죽어버림.
+            reward += REWARD_EAT
             self.foods.remove((i, j))
             self._set_food()
             # self.snake.heal()
             self.eat_cnt += 1
         elif self.map[i][j] == self.SNAKE or self.map[i][j] == self.WALL: # SNAKE 또는 WALL 부딪혔다면
-            reward -= 10
+            reward = REWARD_DEAD
             done = True
 
         # update snake coordinates
