@@ -24,9 +24,12 @@ import logging
 
 # In[3]:
 
-LOAD_MODEL = False
-RENDER = False
 EPISODES = 10000
+
+LOAD_MODEL = False
+LOAD_MODEL_PATH = './Python/snake_dqn_1.bin'
+
+RENDER = False
 RENDER_DELAY = 0.1
 
 class DQNAgent:
@@ -61,7 +64,7 @@ class DQNAgent:
 
         if self.load_model:
             self.model.load_state_dict(torch.load(
-                './Python/snake_dqn_1.bin'))
+                LOAD_MODEL_PATH))
     
     # 상태가 입력, 큐함수가 출력인 인공신경망 생성
     def build_model(self):
@@ -197,28 +200,49 @@ for e in range(EPISODES):
             # pylab.plot(episodes, scores, 'b')
             # pylab.savefig('./Python/snake_dqn.png')
             
-            logging.info(f"episode:{e} score: {score} memory length: "
-                         f"{len(agent.memory)} epsilon: {agent.epsilon}")
+            logging.info(f"episode:{e} score: {score:+} snklen: {info['snake_length']} "
+                         f"memlen: {len(agent.memory)} epsilon: {agent.epsilon}")
             
             if agent.epsilon > agent.epsilon_min:
                 agent.epsilon *= agent.epsilon_decay
             
-            # 최근 10 에피소드의 점수 평균이 -30 이상일 때 저장
-            if save_flag_1 and np.mean(scores[-min(10, len(scores)):]) > -30:
+            # # 최근 10 에피소드의 점수 평균이 -30 이상일 때 저장
+            # if save_flag_1 and np.mean(scores[-min(10, len(scores)):]) > -30:
+            #     torch.save(agent.model.state_dict(),
+            #                "./Python/snake_dqn_1.bin")
+            #     print('model 1 saved at', e)
+            #     save_flag_1 = False
+            
+            # # 최근 10 에피소드의 점수 평균이 10 이상일 때 저장
+            # if save_flag_2 and np.mean(scores[-min(10, len(scores)):]) > 10:
+            #     torch.save(agent.model.state_dict(),
+            #                "./Python/snake_dqn_2.bin")
+            #     print('model 2 saved at', e)
+            #     save_flag_2 = False
+
+            # # 최근 10 에피소드의 점수 평균이 30 이상일 때 종료
+            # if np.mean(scores[-min(10, len(scores)):]) > 30:
+            #     torch.save(agent.model.state_dict(),
+            #                "./Python/snake_dqn_3.bin")
+            #     print('model 3 saved at', e)
+            #     sys.exit()
+            
+            # 뱀의 꼬리가 3 이상일 때 저장
+            if save_flag_1 and info['snake_length'] > 3:
                 torch.save(agent.model.state_dict(),
                            "./Python/snake_dqn_1.bin")
                 print('model 1 saved at', e)
                 save_flag_1 = False
             
-            # 최근 10 에피소드의 점수 평균이 10 이상일 때 저장
-            if save_flag_2 and np.mean(scores[-min(10, len(scores)):]) > 10:
+            # 뱀의 꼬리가 10 이상일 때 저장
+            if save_flag_2 and info['snake_length'] > 10:
                 torch.save(agent.model.state_dict(),
                            "./Python/snake_dqn_2.bin")
                 print('model 2 saved at', e)
                 save_flag_2 = False
-
-            # 최근 10 에피소드의 점수 평균이 30 이상일 때 종료
-            if np.mean(scores[-min(10, len(scores)):]) > 30:
+            
+            # 뱀의 꼬리가 30 이상일 때 종료
+            if info['snake_length'] > 30:
                 torch.save(agent.model.state_dict(),
                            "./Python/snake_dqn_3.bin")
                 print('model 3 saved at', e)

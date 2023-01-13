@@ -171,7 +171,7 @@ class SnakeGym:
             self.snake.heal()
             self.eat_cnt += 1
         elif self.map[i][j] == self.SNAKE or self.map[i][j] == self.WALL: # SNAKE 또는 WALL 부딪혔다면
-            reward -= 100
+            reward -= 10
             done = True
 
         # update snake coordinates
