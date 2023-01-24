@@ -94,8 +94,6 @@ class DQNAgent:
     def append_sample(self, state, action, reward, next_state, done):
         self.memory.append((state, action, reward, next_state, done))
 
-        self.memory.append((state, action, reward, next_state, done))
-
     # 리플레이 메모리에서 무작위로 추출한 배치로 모델 학습
     def train_model(self):
         if self.epsilon > self.epsilon_min:

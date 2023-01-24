@@ -14,7 +14,7 @@ import time
 MAP_SIZE = 10
 
 REWARD_EAT = 10 # 길어지도록 유도
-REWARD_ALIVE = 1 # 
+REWARD_ALIVE = 0 # 
 REWARD_DEAD = -100 # 벽이나 몸통에 닿지 않도록 유도
 
 class Snake:
