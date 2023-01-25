@@ -14,6 +14,7 @@ import sys
 import random
 import numpy as np
 from collections import deque
+import pylab
 
 from keras.layers import Dense
 from keras.optimizers import Adam
@@ -24,7 +25,7 @@ import logging
 # In[3]:
 
 EPISODES = 10000
-EPISODE_LENGTH = 200
+EPISODE_LENGTH = 100
 
 LOAD_MODEL = False
 LOAD_MODEL_PATH = './Python/snake_dqn_1.h5'
@@ -68,7 +69,7 @@ class DQNAgent:
         model = Sequential()
         model.add(Dense(256, input_dim=self.state_size, activation='relu',
                         kernel_initializer='he_uniform'))
-        model.add(Dense(256, activation='relu',
+        model.add(Dense(64, activation='relu',
                         kernel_initializer='he_uniform'))
         model.add(Dense(self.action_size, activation='linear',
                         kernel_initializer='he_uniform'))
@@ -131,8 +132,12 @@ class DQNAgent:
 
 # In[5]:
 
-logging.basicConfig(filename='log.log', level=logging.DEBUG, filemode='w',
-                    format="%(asctime)s %(message)s")
+logging.basicConfig(level=logging.DEBUG,
+                    format="%(asctime)s %(message)s",
+                    handlers=[
+                        logging.FileHandler(filename='log.log', mode='a'),
+                        logging.StreamHandler(sys.stdout)
+                    ])
 logging.info('logging start\n')
 
 env = SnakeGym()
@@ -178,47 +183,45 @@ for e in range(EPISODES):
     scores.append(score)
     episodes.append(e)
     # pylab.plot(episodes, scores, 'b')
-    # pylab.savefig('./Python/snake_dqn.png')
+    # pylab.savefig('scores.png')
     
-    print(f"episode:{e} score: {score:+} snklen: {info['snake_length']} "
+    logging.info(f"episode:{e} score: {score:+} snklen: {info['snake_length']} "
             f"memlen: {len(agent.memory)} epsilon: {agent.epsilon}")
-    # logging.info(f"episode:{e} score: {score:+} snklen: {info['snake_length']} "
-    #              f"memlen: {len(agent.memory)} epsilon: {agent.epsilon}")
     
     # # 최근 10 에피소드의 점수 평균이 -30 이상일 때 저장
     # if save_flag_1 and np.mean(scores[-min(10, len(scores)):]) > -30:
     #     agent.model.save_weights("./Python/snake_dqn_1.h5")
-    #     print('model 1 saved at', e)
+    #     logging.info('model 1 saved at {e}')
     #     save_flag_1 = False
     
     # # 최근 10 에피소드의 점수 평균이 10 이상일 때 저장
     # if save_flag_2 and np.mean(scores[-min(10, len(scores)):]) > 10:
     #     agent.model.save_weights("./Python/snake_dqn_2.h5")
-    #     print('model 2 saved at', e)
+    #     logging.info('model 2 saved at {e}')
     #     save_flag_2 = False
 
     # # 최근 10 에피소드의 점수 평균이 30 이상일 때 종료
     # if np.mean(scores[-min(10, len(scores)):]) > 30:
     #     agent.model.save_weights("./Python/snake_dqn_3.h5")
-    #     print('model 3 saved at', e)
+    #     logging.info('model 3 saved at {e}')
     #     sys.exit()
     
     # 뱀의 꼬리가 3 이상일 때 저장
     if save_flag_1 and info['snake_length'] > 3:
         agent.model.save_weights("./Python/snake_dqn_1.h5")
-        print('model 1 saved at', e)
+        logging.info('model 1 saved at {e}')
         save_flag_1 = False
     
     # 뱀의 꼬리가 5 이상일 때 저장
     if save_flag_2 and info['snake_length'] > 5:
         agent.model.save_weights("./Python/snake_dqn_2.h5")
-        print('model 2 saved at', e)
+        logging.info('model 2 saved at {e}')
         save_flag_2 = False
     
     # 뱀의 꼬리가 10 이상일 때 종료
     if info['snake_length'] > 10:
         agent.model.save_weights("./Python/snake_dqn_3.h5")
-        print('model 3 saved at', e)
+        logging.info('model 3 saved at {e}')
         sys.exit()
     
             
