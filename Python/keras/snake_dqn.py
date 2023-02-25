@@ -14,11 +14,11 @@ import sys
 import random
 import numpy as np
 from collections import deque
-import pylab
+# import pylab
 
-from keras.layers import Dense
-from keras.optimizers import Adam
-from keras.models import Sequential
+from tensorflow.keras.layers import Dense
+from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.models import Sequential
 
 import logging
 
@@ -47,12 +47,12 @@ class DQNAgent:
         self.learning_rate = 0.001
         self.epsilon = 1.0
         self.epsilon_decay = 0.999
-        self.epsilon_min = 0.10
+        self.epsilon_min = 0.01
         self.batch_size = 64
         self.train_start = 1000
 
         # 리플레이 메모리, 최대 크기 5000
-        self.memory = deque(maxlen=5000)
+        self.memory = deque(maxlen=100000)
 
         # 모델과 타깃 모델 생성
         self.model = self.build_model()
