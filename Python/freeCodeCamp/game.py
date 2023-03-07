@@ -26,7 +26,7 @@ BLUE2 = (0, 100, 255)
 BLACK = (0, 0, 0)
 
 BLOCK_SIZE = 20
-SPEED = 40
+SPEED = 100
 
 
 class SnakeGameAI:
@@ -81,6 +81,7 @@ class SnakeGameAI:
         # 3. check if game over
         reward = 0
         game_over = False
+        # TODO: 무한루프에 빠질 수 있음
         if self.is_collision() or self.frame_iteration > 100 * len(self.snake):
             game_over = True
             reward = -10
@@ -127,7 +128,7 @@ class SnakeGameAI:
     def _move(self, action: List[int]):
         # [직진, 우회전, 좌회전]
         clock_wise = [Direction.RIGHT, Direction.DOWN, Direction.LEFT, Direction.UP]
-        idx = clock_wise.index(self.display)
+        idx = clock_wise.index(self.direction)
 
         if np.array_equal(action, [1, 0, 0]):
             new_dir = clock_wise[idx]  # no change

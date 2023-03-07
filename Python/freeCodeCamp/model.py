@@ -51,10 +51,21 @@ class QTrainer:
         # 1: predicted Q values with current state
         pred = self.model(state)
 
-        target = pred.clone(0)
-        for idx in range()
+        target = pred.clone()
+        for idx in range(len(done)):
+            Q_new = reward[idx]
+            if not done[idx]:
+                Q_new = reward[idx] + self.gamma * torch.max(self.model(next_state[idx]))
 
-        # 2: Q_new = r + gamma * max(next_predicted Q value)
+            target[idx][torch.argmax(action[idx]).item()] = Q_new
+
+        # 2: Q_new = r + gamma * max(next_predicted Q value) -> only do this if not done
         # pred.clone()
         # preds[argmax(action)] = Q_new
-        # e.g., action: [1, 0, 0] 이면, 0번 인덱스에 Q_new를 대입
+        # e.g., action: [1, 0, 0] 이면, 0번 자리에 Q_new를 대입
+
+        self.optimizer.zero_grad()
+        loss = self.criterion(target, pred)
+        loss.backward()  # back propagation and update gradients
+
+        self.optimizer.step()
