@@ -48,11 +48,11 @@ class DQNAgent:
         self.epsilon = 1.0
         self.epsilon_decay = 0.999
         self.epsilon_min = 0.01
-        self.batch_size = 64
+        self.batch_size = 1000
         self.train_start = 1000
 
-        # 리플레이 메모리, 최대 크기 5000
-        self.memory = deque(maxlen=100000)
+        # 리플레이 메모리
+        self.memory = deque(maxlen=100_000)
 
         # 모델과 타깃 모델 생성
         self.model = self.build_model()
@@ -69,8 +69,6 @@ class DQNAgent:
         model = Sequential()
         model.add(Dense(256, input_dim=self.state_size, activation='relu',
                         kernel_initializer='he_uniform'))
-        model.add(Dense(64, activation='relu',
-                        kernel_initializer='he_uniform'))
         model.add(Dense(self.action_size, activation='linear',
                         kernel_initializer='he_uniform'))
         model.summary()
@@ -83,13 +81,16 @@ class DQNAgent:
 
     # 입실론 탐욕 정책으로 행동 선택
     def get_action(self, state):
+        action = [0, 0, 0, 0]
         if np.random.rand() <= self.epsilon:
             # 무작위 행동 반환
-            return random.randrange(self.action_size)
+            i = random.randrange(self.action_size)
         else:
             # 모델로부터 행동 산출
             q_value = self.model.predict(state, verbose=0)
-            return np.argmax(q_value[0])
+            i = np.argmax(q_value[0])
+        action[i] = 1
+        return action
 
     # 샘플 <s, a, r, s'>을 리플레이 메모리에 저장
     def append_sample(self, state, action, reward, next_state, done):

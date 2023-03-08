@@ -19,17 +19,15 @@ REWARD_EAT = 10 # 길어지도록 유도
 REWARD_ALIVE = 0 # 
 REWARD_DEAD = -10 # 벽이나 몸통에 닿지 않도록 유도
 
-class Direction(Enum):
-    UP = 0
-    RIGHT = 1
-    DOWN = 2
-    LEFT = 3
+UP = [1, 0, 0, 0]
+RIGHT = [0, 1, 0, 0]
+DOWN = [0, 0, 1, 0]
+LEFT = [0, 0, 0, 1]
 
-class MapLabel(Enum):
-    EMPTY = 0
-    SNAKE = 1
-    FOOD = 2
-    WALL = 3
+EMPTY = 0
+SNAKE = 1
+FOOD = 2
+WALL = 3
 
 class Snake:
     # single agent now
@@ -42,6 +40,7 @@ class Snake:
         TODO: health 개념 비활성화
     
     map_size: int
+        전체 지도는 가로 세로가 각각 map_size인 정사각형 형태
     '''
 
     def __init__(self, map_size, starting_pos=(0, 0)):
@@ -86,12 +85,13 @@ class SnakeGym:
         self.snake = Snake(map_size=map_size) # Snake class
         self.foods = []  # [(int, int)]
         self.map = None  # [(int, int)]
-        self.last_action: Direction = None
+        self.last_action: list[int] = None
 
     def reset(self):
         self.step_len = 0
         self.eat_cnt = 0
         starting_pos = (random.randint(1, self.map_size - 2), random.randint(1, self.map_size - 2))
+        self.last_action = UP
         
         del self.snake
         self.snake = Snake(map_size=self.map_size,
@@ -100,13 +100,13 @@ class SnakeGym:
 
         # generate the wall
         for i in range(self.map_size):
-            self.map[0][i] = self.WALL
-            self.map[i][0] = self.WALL
-            self.map[self.map_size - 1][i] = self.WALL
-            self.map[i][self.map_size - 1] = self.WALL
+            self.map[0][i] = WALL
+            self.map[i][0] = WALL
+            self.map[self.map_size - 1][i] = WALL
+            self.map[i][self.map_size - 1] = WALL
 
         # starting posision of snake
-        self.map[starting_pos[0]][starting_pos[1]] = self.SNAKE
+        self.map[starting_pos[0]][starting_pos[1]] = SNAKE
 
         self._set_food()
         # self._set_obstacle()
@@ -135,7 +135,7 @@ class SnakeGym:
                 break
         self.map[i][j] = 3
 
-    def step(self, action):
+    def step(self, action: list[int]):
         """
         움직이게 될 자리에 뭐가 있는지 체크
         - 벽이 있다면, 사망
@@ -147,16 +147,16 @@ class SnakeGym:
         done = False
         grow = False
 
-        if action == Direction.UP:
+        if np.array_equal(action, UP):
             direc = [-1, 0]
-        elif action == Direction.RIGHT:
+        elif np.array_equal(action, RIGHT):
             direc = [0, 1]
-        elif action == Direction.DOWN:
+        elif np.array_equal(action, DOWN):
             direc = [1, 0]
-        elif action == Direction.LEFT:
+        elif np.array_equal(action, LEFT):
             direc = [0, -1]
         else:
-            raise ValueError('input must be 0, 1, 2, 3')
+            raise ValueError('input must be like [1, 0, 0, 0] style')
         self.last_action = action
 
         i, j = self.snake.head_pos()[0] + direc[0], self.snake.head_pos()[1] + direc[1]
@@ -165,20 +165,20 @@ class SnakeGym:
         # if self.snake.health_decrease() == 'dead': # 체력 없다면
         #     done = True
         #     reward = REWARD_DEAD
-        if self.map[i][j] == MapLabel.FOOD: # FOOD 먹었다면
+        if self.map[i][j] == FOOD: # FOOD 먹었다면
             grow = True
             reward += REWARD_EAT
             self.foods.remove((i, j))
             self._set_food()
             # self.snake.heal()
             self.eat_cnt += 1
-        elif self.map[i][j] == MapLabel.SNAKE or self.map[i][j] == MapLabel.WALL: # SNAKE 또는 WALL 부딪혔다면
+        elif self.map[i][j] == SNAKE or self.map[i][j] == WALL: # SNAKE 또는 WALL 부딪혔다면
             reward = REWARD_DEAD
             done = True
 
         # update snake coordinates
         self.snake.insert_head((i, j))
-        self.map[i][j] = self.SNAKE
+        self.map[i][j] = SNAKE
         if not grow:
             i, j = self.snake.pop_tail()
             self.map[i][j] = 0
@@ -199,7 +199,7 @@ class SnakeGym:
         # 음식이 여러개 있는 경우, 가장 가까운 음식을 기준으로
         food up, food right,
         food down, food left
-        ] 
+        ]
         '''
         state = np.zeros(self.state_size, dtype=np.int32)
         head = self.snake.head_pos()
@@ -210,28 +210,28 @@ class SnakeGym:
         head_l = (head[0], head[1] - 1)
         
         # danger straight
-        state[0] = self.last_action == Direction.UP and self._is_collision(head_u) or\
-                    self.last_action == Direction.RIGHT and self._is_collision(head_r) or\
-                    self.last_action == Direction.DOWN and self._is_collision(head_d) or\
-                    self.last_action == Direction.LEFT and self._is_collision(head_l)
+        state[0] = self.last_action == UP and self._is_collision(head_u) or\
+                    self.last_action == RIGHT and self._is_collision(head_r) or\
+                    self.last_action == DOWN and self._is_collision(head_d) or\
+                    self.last_action == LEFT and self._is_collision(head_l)
         
         # danger right
-        state[1] = self.last_action == Direction.UP and self._is_collision(head_r) or\
-                    self.last_action == Direction.RIGHT and self._is_collision(head_d) or\
-                    self.last_action == Direction.DOWN and self._is_collision(head_l) or\
-                    self.last_action == Direction.LEFT and self._is_collision(head_u)
+        state[1] = self.last_action == UP and self._is_collision(head_r) or\
+                    self.last_action == RIGHT and self._is_collision(head_d) or\
+                    self.last_action == DOWN and self._is_collision(head_l) or\
+                    self.last_action == LEFT and self._is_collision(head_u)
         
         # danger left
-        state[2] = self.last_action == Direction.UP and self._is_collision(head_l) or\
-                    self.last_action == Direction.RIGHT and self._is_collision(head_u) or\
-                    self.last_action == Direction.DOWN and self._is_collision(head_r) or\
-                    self.last_action == Direction.LEFT and self._is_collision(head_d)
+        state[2] = self.last_action == UP and self._is_collision(head_l) or\
+                    self.last_action == RIGHT and self._is_collision(head_u) or\
+                    self.last_action == DOWN and self._is_collision(head_r) or\
+                    self.last_action == LEFT and self._is_collision(head_d)
         
         # direction
-        state[3:7] = [self.last_action == Direction.UP,
-                      self.last_action == Direction.RIGHT,
-                      self.last_action == Direction.DOWN,
-                      self.last_action == Direction.LEFT]
+        state[3:7] = [self.last_action == UP,
+                      self.last_action == RIGHT,
+                      self.last_action == DOWN,
+                      self.last_action == LEFT]
         
         # 머리에서 가장 가까운 food 찾기
         closest_food = None
@@ -244,11 +244,9 @@ class SnakeGym:
         
         # food
         state[7] = closest_food[0] < head[0] # food up
-        state[8] = closest_food[1] > head[1]
-        state[9] = closest_food[0] > head[0]
-        state[10] = closest_food[1] < head[1]
-        
-        #TODO: 여기서부터 이어서 코드짜면됨
+        state[8] = closest_food[1] > head[1] # food right
+        state[9] = closest_food[0] > head[0] # food down
+        state[10] = closest_food[1] < head[1] # food left
         
         return state
     
@@ -258,7 +256,9 @@ class SnakeGym:
         if pt is None:
             pt = self.snake.head_pos()
         i, j = pt
-        if self.map[i][j] == MapLabel.SNAKE or self.map[i][j] == MapLabel.WALL:
+        if i < 0 or i >= self.map_size or j < 0 or j >= self.map_size:
+            return True
+        elif self.map[i][j] == SNAKE or self.map[i][j] == WALL:
             return True
         else:
             return False
@@ -268,13 +268,13 @@ class SnakeGym:
 
         for i in range(self.map_size):
             for j in range(self.map_size):
-                if self.map[i][j] == 0:  # empty
+                if self.map[i][j] == EMPTY:
                     print(' ', end=' ')
-                elif self.map[i][j] == 1:  # snake
+                elif self.map[i][j] == SNAKE:
                     print('O', end=' ')
-                elif self.map[i][j] == 2:  # food
+                elif self.map[i][j] == FOOD:
                     print('*', end=' ')
-                if self.map[i][j] == 3:  # obstacle
+                if self.map[i][j] == WALL:
                     print('#', end=' ')
             print()
         
@@ -283,13 +283,13 @@ class SnakeGym:
 
     def _char2idx(self, char):
         if char == 'w':
-            return Direction.UP
+            return UP
         elif char == 'd':
-            return Direction.RIGHT
+            return RIGHT
         elif char == 's':
-            return Direction.DOWN
+            return DOWN
         elif char == 'a':
-            return Direction.LEFT
+            return LEFT
         else:
             print('input must be 0, 1, 2, 3')
             return 'invalidInput'
