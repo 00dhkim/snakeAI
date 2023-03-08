@@ -76,7 +76,7 @@ class Snake:
 class SnakeGym:
     
     def __init__(self, map_size=MAP_SIZE):
-        self.state_size = 11
+        self.state_size = 12
         self.action_size = 4
         self.map_size = map_size
         self.step_len = 0
@@ -191,7 +191,8 @@ class SnakeGym:
     
     def _get_state(self):
         '''
-        [danger straight, danger right, danger left,
+        [danger up, danger right,
+        danger down, danger left,
 
         direction up, direction right,
         direction down, direction left,
@@ -209,26 +210,20 @@ class SnakeGym:
         head_d = (head[0] + 1, head[1])
         head_l = (head[0], head[1] - 1)
         
-        # danger straight
-        state[0] = self.last_action == UP and self._is_collision(head_u) or\
-                    self.last_action == RIGHT and self._is_collision(head_r) or\
-                    self.last_action == DOWN and self._is_collision(head_d) or\
-                    self.last_action == LEFT and self._is_collision(head_l)
+        # danger up
+        state[0] = self._is_collision(head_u)
         
         # danger right
-        state[1] = self.last_action == UP and self._is_collision(head_r) or\
-                    self.last_action == RIGHT and self._is_collision(head_d) or\
-                    self.last_action == DOWN and self._is_collision(head_l) or\
-                    self.last_action == LEFT and self._is_collision(head_u)
+        state[1] = self._is_collision(head_r)
+        
+        # danger down
+        state[2] = self._is_collision(head_d)
         
         # danger left
-        state[2] = self.last_action == UP and self._is_collision(head_l) or\
-                    self.last_action == RIGHT and self._is_collision(head_u) or\
-                    self.last_action == DOWN and self._is_collision(head_r) or\
-                    self.last_action == LEFT and self._is_collision(head_d)
+        state[3] = self._is_collision(head_l)
         
         # direction
-        state[3:7] = [self.last_action == UP,
+        state[4:8] = [self.last_action == UP,
                       self.last_action == RIGHT,
                       self.last_action == DOWN,
                       self.last_action == LEFT]
@@ -243,10 +238,10 @@ class SnakeGym:
                     closest_food = food
         
         # food
-        state[7] = closest_food[0] < head[0] # food up
-        state[8] = closest_food[1] > head[1] # food right
-        state[9] = closest_food[0] > head[0] # food down
-        state[10] = closest_food[1] < head[1] # food left
+        state[8] = closest_food[0] < head[0] # food up
+        state[9] = closest_food[1] > head[1] # food right
+        state[10] = closest_food[0] > head[0] # food down
+        state[11] = closest_food[1] < head[1] # food left
         
         return state
     
@@ -257,8 +252,8 @@ class SnakeGym:
             pt = self.snake.head_pos()
         i, j = pt
         if i < 0 or i >= self.map_size or j < 0 or j >= self.map_size:
-            return True
-        elif self.map[i][j] == SNAKE or self.map[i][j] == WALL:
+            return True # 맵 밖으로 나가면 부딪힌 것으로 간주
+        elif self.map[i][j] in [SNAKE, WALL]:
             return True
         else:
             return False
