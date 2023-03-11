@@ -11,6 +11,7 @@ import numpy as np
 import time
 from enum import Enum
 from typing import List, Tuple
+import pygame
 
 MAP_SIZE = 10
 
@@ -27,6 +28,18 @@ EMPTY = 0
 SNAKE = 1
 FOOD = 2
 WALL = 3
+
+# RGB colors
+BLACK = (0, 0, 0)
+WHITE = (255, 255, 255)
+RED = (200, 0, 0)
+BLUE = (0, 100, 255)
+
+BLOCK_SIZE = 20  # pygame 한 블록의 크기
+FPS = 100  # pygame frame per second
+
+pygame.init()
+font = pygame.font.Font('./arial.ttf', 22)
 
 
 class Snake:
@@ -88,6 +101,10 @@ class SnakeGym:
         self.map = None  # [(int, int)]
         self.last_action: List[int] = None
 
+        self.display = pygame.display.set_mode((self.map_size * BLOCK_SIZE, self.map_size * BLOCK_SIZE))
+        pygame.display.set_caption('Snake')
+        self.clock = pygame.time.Clock()
+
     def reset(self):
         self.step_len = 0
         self.eat_cnt = 0
@@ -143,6 +160,11 @@ class SnakeGym:
         - 먹이가 있다면, 성장
         그 후, 이동
         """
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+
         self.step_len += 1
         reward = REWARD_ALIVE
         done = False
@@ -184,15 +206,34 @@ class SnakeGym:
             i, j = self.snake.pop_tail()
             self.map[i][j] = 0
 
+        self._update_ui()
+        self.clock.tick(FPS)
+
         return self._get_state(), reward, done, {'step_length': self.step_len,
                                                  'snake_length': self.snake.locations.__len__(),
                                                  'snake_health': self.snake.health,
                                                  'eat_cnt': self.eat_cnt,
                                                  }
 
+    def _update_ui(self):
+        # update display
+        self.display.fill(BLACK)
+        for i in range(self.map_size):
+            for j in range(self.map_size):
+                if self.map[i][j] == SNAKE:
+                    pygame.draw.rect(self.display, BLUE, [j * BLOCK_SIZE, i * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE])
+                elif self.map[i][j] == FOOD:
+                    pygame.draw.rect(self.display, RED, [j * BLOCK_SIZE, i * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE])
+                elif self.map[i][j] == WALL:
+                    pygame.draw.rect(self.display, WHITE, [j * BLOCK_SIZE, i * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE])
+        text = font.render(f"Score: {self.eat_cnt}", True, BLACK)
+        self.display.blit(text, [0, 0])
+        pygame.display.update()
+
     def _get_state(self):
         """
-        [danger straight, danger right, danger left,
+        [danger up, danger right,
+        danger down, danger left,
 
         direction up, direction right,
         direction down, direction left,
@@ -210,26 +251,20 @@ class SnakeGym:
         head_d = (head[0] + 1, head[1])
         head_l = (head[0], head[1] - 1)
 
-        # danger straight
-        state[0] = self.last_action == UP and self._is_collision(head_u) or \
-                   self.last_action == RIGHT and self._is_collision(head_r) or \
-                   self.last_action == DOWN and self._is_collision(head_d) or \
-                   self.last_action == LEFT and self._is_collision(head_l)
+        # danger up
+        state[0] = self._is_collision(head_u)
 
         # danger right
-        state[1] = self.last_action == UP and self._is_collision(head_r) or \
-                   self.last_action == RIGHT and self._is_collision(head_d) or \
-                   self.last_action == DOWN and self._is_collision(head_l) or \
-                   self.last_action == LEFT and self._is_collision(head_u)
+        state[1] = self._is_collision(head_r)
+
+        # danger down
+        state[2] = self._is_collision(head_d)
 
         # danger left
-        state[2] = self.last_action == UP and self._is_collision(head_l) or \
-                   self.last_action == RIGHT and self._is_collision(head_u) or \
-                   self.last_action == DOWN and self._is_collision(head_r) or \
-                   self.last_action == LEFT and self._is_collision(head_d)
+        state[3] = self._is_collision(head_l)
 
         # direction
-        state[3:7] = [self.last_action == UP,
+        state[4:8] = [self.last_action == UP,
                       self.last_action == RIGHT,
                       self.last_action == DOWN,
                       self.last_action == LEFT]
@@ -259,29 +294,11 @@ class SnakeGym:
             pt = self.snake.head_pos()
         i, j = pt
         if i < 0 or i >= self.map_size or j < 0 or j >= self.map_size:
-            return True
-        elif self.map[i][j] == SNAKE or self.map[i][j] == WALL:
+            return True  # 맵 밖으로 나가면 부딪힌 것으로 간주
+        elif self.map[i][j] in [SNAKE, WALL]:
             return True
         else:
             return False
-
-    def render(self, delay: float = 0.0):
-        _ = os.system('cls' if os.name == 'nt' else 'clear')
-
-        for i in range(self.map_size):
-            for j in range(self.map_size):
-                if self.map[i][j] == EMPTY:
-                    print(' ', end=' ')
-                elif self.map[i][j] == SNAKE:
-                    print('O', end=' ')
-                elif self.map[i][j] == FOOD:
-                    print('*', end=' ')
-                if self.map[i][j] == WALL:
-                    print('#', end=' ')
-            print()
-
-        if delay:
-            time.sleep(delay)
 
     def _char2idx(self, char):
         if char == 'w':

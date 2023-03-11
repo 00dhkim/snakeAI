@@ -29,13 +29,9 @@ EPISODE_LENGTH = 100
 LOAD_MODEL = False
 LOAD_MODEL_PATH = './Python/snake_dqn_1.h5'
 
-RENDER = False
-RENDER_DELAY = 0.1
-
 
 class DQNAgent:
     def __init__(self, state_size, action_size):
-        self.render = RENDER
         self.load_model = LOAD_MODEL
 
         # 상태와 행동의 크기 정의
@@ -161,9 +157,6 @@ for e in range(EPISODES):
     state = np.reshape(state, [1, state_size])  # (1, 300)
 
     for _ in range(EPISODE_LENGTH):
-        if RENDER:
-            print(f'episode: {e}')
-            env.render(delay=RENDER_DELAY)
 
         # 현재 상태로 행동을 선택
         action = agent.get_action(state)
