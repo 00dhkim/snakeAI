@@ -90,7 +90,7 @@ class Snake:
 class SnakeGym:
 
     def __init__(self, map_size=MAP_SIZE):
-        self.state_size = 11
+        self.state_size = 12
         self.action_size = 4
         self.map_size = map_size
         self.step_len = 0
@@ -280,12 +280,12 @@ class SnakeGym:
                     closest_food = food
 
         # food
-        state[7] = closest_food[0] < head[0]  # food up
-        state[8] = closest_food[1] > head[1]  # food right
-        state[9] = closest_food[0] > head[0]  # food down
-        state[10] = closest_food[1] < head[1]  # food left
+        state[8] = closest_food[0] < head[0]  # food up
+        state[9] = closest_food[1] > head[1]  # food right
+        state[10] = closest_food[0] > head[0]  # food down
+        state[11] = closest_food[1] < head[1]  # food left
 
-        return state
+        return np.array(state, dtype=np.int32)
 
     def _is_collision(self, pt: tuple = None):
         """지금 pt 위치 기준 부딪혔는지 여부

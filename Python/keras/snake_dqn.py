@@ -23,7 +23,7 @@ import logging
 
 # In[3]:
 
-EPISODES = 10000
+EPISODES = 1000
 EPISODE_LENGTH = 100
 
 LOAD_MODEL = False
@@ -63,10 +63,8 @@ class DQNAgent:
     # 상태가 입력, 큐함수가 출력인 인공신경망 생성
     def build_model(self):
         model = Sequential()
-        model.add(Dense(256, input_dim=self.state_size, activation='relu',
-                        kernel_initializer='he_uniform'))
-        model.add(Dense(self.action_size, activation='linear',
-                        kernel_initializer='he_uniform'))
+        model.add(Dense(256, input_dim=self.state_size, activation='relu'))
+        model.add(Dense(self.action_size, activation='linear'))
         model.summary()
         model.compile(loss='mse', optimizer=Adam(lr=self.learning_rate))
         return model
@@ -78,15 +76,17 @@ class DQNAgent:
     # 입실론 탐욕 정책으로 행동 선택
     def get_action(self, state):
         action = [0, 0, 0, 0]
+        is_random = True
         if np.random.rand() <= self.epsilon:
             # 무작위 행동 반환
             i = random.randrange(self.action_size)
         else:
             # 모델로부터 행동 산출
+            is_random = False
             q_value = self.model.predict(state, verbose=0)
             i = np.argmax(q_value[0])
         action[i] = 1
-        return action
+        return action, is_random
 
     # 샘플 <s, a, r, s'>을 리플레이 메모리에 저장
     def append_sample(self, state, action, reward, next_state, done):
@@ -159,7 +159,7 @@ for e in range(EPISODES):
     for _ in range(EPISODE_LENGTH):
 
         # 현재 상태로 행동을 선택
-        action = agent.get_action(state)
+        action, _is_random = agent.get_action(state)
 
         # 선택한 행동으로 환경에서 한 타임스텝 진행
         next_state, reward, done, info = env.step(action)
