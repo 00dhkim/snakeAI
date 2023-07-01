@@ -112,41 +112,44 @@ def train():
     agent = Agent()
     game = SnakeGameAI()
     
-    # TODO: 종료조건 넣기
-    while True:
-        # get old state
-        state_old = agent.get_state(game)
+    for _ in range(200):
+        while True:
+            # get old state
+            state_old = agent.get_state(game)
 
-        # get move
-        final_move = agent.get_action(state_old)
+            # get move
+            final_move = agent.get_action(state_old)
 
-        # perform move and get new state
-        reward, done, score = game.play_step(final_move)
-        state_new = agent.get_state(game)
+            # perform move and get new state
+            reward, done, score = game.play_step(final_move)
+            state_new = agent.get_state(game)
 
-        # train short memory
-        agent.train_short_memory(state_old, final_move, reward, state_new, done)
+            # train short memory
+            agent.train_short_memory(state_old, final_move, reward, state_new, done)
 
-        # remember
-        agent.remember(state_old, final_move, reward, state_new, done)
+            # remember
+            agent.remember(state_old, final_move, reward, state_new, done)
 
-        if done:
-            # train long memory, plot result
-            game.reset()
-            agent.n_games += 1
-            agent.train_long_memory()
+            if done:
+                break
+        
+        # train long memory, plot result
+        game.reset()
+        agent.n_games += 1
+        agent.train_long_memory()
 
-            if score > highest_score:
-                highest_score = score
-                agent.model.save()
+        if score > highest_score:
+            highest_score = score
+            agent.model.save()
 
-            print(f'Game {agent.n_games} Score {score} Highest Score {highest_score}')
+        print(f'Game {agent.n_games} Score {score} Highest Score {highest_score}'
+                f' Epsilon {agent.epsilon/200} Memory Length {len(agent.memory)}')
 
-            plot_scores.append(score)
-            total_score += score
-            mean_score = total_score / agent.n_games
-            plot_mean_scores.append(mean_score)
-            plot(plot_scores, plot_mean_scores)
+        plot_scores.append(score)
+        total_score += score
+        mean_score = total_score / agent.n_games
+        plot_mean_scores.append(mean_score)
+        plot(plot_scores, plot_mean_scores)
 
 
 
