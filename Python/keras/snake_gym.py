@@ -5,19 +5,19 @@ snake 게임의 플레이 기능 담은 소스코드
 
 """
 
-
 import os
 import random
 import numpy as np
 import time
 from enum import Enum
 from typing import List, Tuple
+import pygame
 
 MAP_SIZE = 10
 
-REWARD_EAT = 10 # 길어지도록 유도
-REWARD_ALIVE = 0 # 
-REWARD_DEAD = -10 # 벽이나 몸통에 닿지 않도록 유도
+REWARD_EAT = 10  # 길어지도록 유도
+REWARD_ALIVE = 0  #
+REWARD_DEAD = -10  # 벽이나 몸통에 닿지 않도록 유도
 
 UP = [1, 0, 0, 0]
 RIGHT = [0, 1, 0, 0]
@@ -29,19 +29,32 @@ SNAKE = 1
 FOOD = 2
 WALL = 3
 
+# RGB colors
+BLACK = (0, 0, 0)
+WHITE = (255, 255, 255)
+RED = (200, 0, 0)
+BLUE = (0, 100, 255)
+
+BLOCK_SIZE = 20  # pygame 한 블록의 크기
+FPS = 100  # pygame frame per second
+
+pygame.init()
+font = pygame.font.Font('./arial.ttf', 22)
+
+
 class Snake:
     # single agent now
-    '''
+    """
     locations: [(int, int)]
         snake 위치를 나타내는 리스트, (i, j)
-    
+
     health: int
         100으로 초기화, 매 step -1, 0이 되면 사망
         TODO: health 개념 비활성화
-    
+
     map_size: int
         전체 지도는 가로 세로가 각각 map_size인 정사각형 형태
-    '''
+    """
 
     def __init__(self, map_size, starting_pos=(0, 0)):
         self.map_size = map_size
@@ -51,13 +64,13 @@ class Snake:
 
     def insert_head(self, pos):
         self.locations.insert(0, pos)
-    
+
     def pop_tail(self):
         return self.locations.pop()
-    
+
     def head_pos(self):
         return self.locations[0]
-    
+
     # TODO: health 개념 비활성화
     # def health_decrease(self):
     #     self.health -= 1
@@ -65,16 +78,17 @@ class Snake:
     #         return 'dead'
     #     else:
     #         return self.health
-    
+
     # TODO: health 개념 비활성화
     # def heal(self):
     #     self.health = 100
-    
+
     # def __getitem__(self, index):
     #     return self.locations[index]
 
+
 class SnakeGym:
-    
+
     def __init__(self, map_size=MAP_SIZE):
         self.state_size = 12
         self.action_size = 4
@@ -82,17 +96,21 @@ class SnakeGym:
         self.step_len = 0
         self.eat_cnt = 0
 
-        self.snake = Snake(map_size=map_size) # Snake class
+        self.snake = Snake(map_size=map_size)  # Snake class
         self.foods = []  # [(int, int)]
         self.map = None  # [(int, int)]
-        self.last_action: list[int] = None
+        self.last_action: List[int] = None
+
+        self.display = pygame.display.set_mode((self.map_size * BLOCK_SIZE, self.map_size * BLOCK_SIZE))
+        pygame.display.set_caption('Snake')
+        self.clock = pygame.time.Clock()
 
     def reset(self):
         self.step_len = 0
         self.eat_cnt = 0
         starting_pos = (random.randint(1, self.map_size - 2), random.randint(1, self.map_size - 2))
         self.last_action = UP
-        
+
         del self.snake
         self.snake = Snake(map_size=self.map_size,
                            starting_pos=starting_pos)
@@ -110,7 +128,7 @@ class SnakeGym:
 
         self._set_food()
         # self._set_obstacle()
-        
+
         return self._get_state()
 
     def _set_food(self):
@@ -135,13 +153,18 @@ class SnakeGym:
                 break
         self.map[i][j] = 3
 
-    def step(self, action: list[int]):
+    def step(self, action: List[int]):
         """
         움직이게 될 자리에 뭐가 있는지 체크
         - 벽이 있다면, 사망
         - 먹이가 있다면, 성장
         그 후, 이동
         """
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+
         self.step_len += 1
         reward = REWARD_ALIVE
         done = False
@@ -160,19 +183,19 @@ class SnakeGym:
         self.last_action = action
 
         i, j = self.snake.head_pos()[0] + direc[0], self.snake.head_pos()[1] + direc[1]
-        
+
         # TODO: health 개념 비활성화
         # if self.snake.health_decrease() == 'dead': # 체력 없다면
         #     done = True
         #     reward = REWARD_DEAD
-        if self.map[i][j] == FOOD: # FOOD 먹었다면
+        if self.map[i][j] == FOOD:  # FOOD 먹었다면
             grow = True
             reward += REWARD_EAT
             self.foods.remove((i, j))
             self._set_food()
             # self.snake.heal()
             self.eat_cnt += 1
-        elif self.map[i][j] == SNAKE or self.map[i][j] == WALL: # SNAKE 또는 WALL 부딪혔다면
+        elif self.map[i][j] == SNAKE or self.map[i][j] == WALL:  # SNAKE 또는 WALL 부딪혔다면
             reward = REWARD_DEAD
             done = True
 
@@ -183,14 +206,32 @@ class SnakeGym:
             i, j = self.snake.pop_tail()
             self.map[i][j] = 0
 
+        self._update_ui()
+        self.clock.tick(FPS)
+
         return self._get_state(), reward, done, {'step_length': self.step_len,
                                                  'snake_length': self.snake.locations.__len__(),
                                                  'snake_health': self.snake.health,
                                                  'eat_cnt': self.eat_cnt,
                                                  }
-    
+
+    def _update_ui(self):
+        # update display
+        self.display.fill(BLACK)
+        for i in range(self.map_size):
+            for j in range(self.map_size):
+                if self.map[i][j] == SNAKE:
+                    pygame.draw.rect(self.display, BLUE, [j * BLOCK_SIZE, i * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE])
+                elif self.map[i][j] == FOOD:
+                    pygame.draw.rect(self.display, RED, [j * BLOCK_SIZE, i * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE])
+                elif self.map[i][j] == WALL:
+                    pygame.draw.rect(self.display, WHITE, [j * BLOCK_SIZE, i * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE])
+        text = font.render(f"Score: {self.eat_cnt}", True, BLACK)
+        self.display.blit(text, [0, 0])
+        pygame.display.update()
+
     def _get_state(self):
-        '''
+        """
         [danger up, danger right,
         danger down, danger left,
 
@@ -201,80 +242,63 @@ class SnakeGym:
         food up, food right,
         food down, food left
         ]
-        '''
+        """
         state = np.zeros(self.state_size, dtype=np.int32)
         head = self.snake.head_pos()
-        
+
         head_u = (head[0] - 1, head[1])
         head_r = (head[0], head[1] + 1)
         head_d = (head[0] + 1, head[1])
         head_l = (head[0], head[1] - 1)
-        
+
         # danger up
         state[0] = self._is_collision(head_u)
-        
+
         # danger right
         state[1] = self._is_collision(head_r)
-        
+
         # danger down
         state[2] = self._is_collision(head_d)
-        
+
         # danger left
         state[3] = self._is_collision(head_l)
-        
+
         # direction
         state[4:8] = [self.last_action == UP,
                       self.last_action == RIGHT,
                       self.last_action == DOWN,
                       self.last_action == LEFT]
-        
+
         # 머리에서 가장 가까운 food 찾기
         closest_food = None
         for food in self.foods:
             if closest_food is None:
                 closest_food = food
             else:
-                if abs(head[0] - food[0]) + abs(head[1] - food[1]) < abs(head[0] - closest_food[0]) + abs(head[1] - closest_food[1]):
+                if abs(head[0] - food[0]) + abs(head[1] - food[1]) < abs(head[0] - closest_food[0]) + abs(
+                        head[1] - closest_food[1]):
                     closest_food = food
-        
+
         # food
-        state[8] = closest_food[0] < head[0] # food up
-        state[9] = closest_food[1] > head[1] # food right
-        state[10] = closest_food[0] > head[0] # food down
-        state[11] = closest_food[1] < head[1] # food left
-        
-        return state
-    
-    def _is_collision(self, pt: tuple=None):
+        state[8] = closest_food[0] < head[0]  # food up
+        state[9] = closest_food[1] > head[1]  # food right
+        state[10] = closest_food[0] > head[0]  # food down
+        state[11] = closest_food[1] < head[1]  # food left
+
+        return np.array(state, dtype=np.int32)
+
+    def _is_collision(self, pt: tuple = None):
         """지금 pt 위치 기준 부딪혔는지 여부
         """
         if pt is None:
             pt = self.snake.head_pos()
         i, j = pt
         if i < 0 or i >= self.map_size or j < 0 or j >= self.map_size:
-            return True # 맵 밖으로 나가면 부딪힌 것으로 간주
+            return True  # 맵 밖으로 나가면 부딪힌 것으로 간주
         elif self.map[i][j] in [SNAKE, WALL]:
             return True
         else:
             return False
-    
-    def render(self, delay: float = 0.0):
-        _ = os.system('cls' if os.name == 'nt' else 'clear')
-
-        for i in range(self.map_size):
-            for j in range(self.map_size):
-                if self.map[i][j] == EMPTY:
-                    print(' ', end=' ')
-                elif self.map[i][j] == SNAKE:
-                    print('O', end=' ')
-                elif self.map[i][j] == FOOD:
-                    print('*', end=' ')
-                if self.map[i][j] == WALL:
-                    print('#', end=' ')
-            print()
-        
-        if delay:
-            time.sleep(delay)
 
     def _char2idx(self, char):
         if char == 'w':
