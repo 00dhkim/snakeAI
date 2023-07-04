@@ -22,4 +22,5 @@ def plot(scores, mean_scores):
     plt.pause(.1)
 
 def savefig(filename):
+    plt.title('Train Result')
     plt.savefig(filename)
