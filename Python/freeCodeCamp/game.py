@@ -24,10 +24,16 @@ RED = (200, 0, 0)
 BLUE1 = (0, 0, 255)
 BLUE2 = (0, 100, 255)
 BLACK = (0, 0, 0)
+GRAY = (50, 50, 50)
 
 BLOCK_SIZE = 20
-SPEED = 10000 # 숫자가 클수록 빠름. 100이면 관찰하기 적당.
+SPEED = 1000 # 숫자가 클수록 빠름. 100이면 관찰하기 적당.
 
+REWARD_GAME_OVER = -10
+REWARD_EAT_FOOD = 10
+REWARD_JUST_MOVE = -0.001
+
+N_OBSTACLES = 0
 
 class SnakeGameAI:
 
@@ -39,6 +45,7 @@ class SnakeGameAI:
         self.food = Point(0, 0)
         self.obstacles = []
         self.frame_iteration = 0
+        self.episode = -1
 
         self.w = w
         self.h = h
@@ -57,13 +64,15 @@ class SnakeGameAI:
                       Point(self.head.x - 2 * BLOCK_SIZE, self.head.y)]
         self.score = 0
         self._place_food()
-        self._generate_obstacle()
+        self._generate_obstacle(N_OBSTACLES)
         self.frame_iteration = 0
+        self.episode += 1
 
     def _place_food(self):
-        self.food = self._generate_random_point(self.w, self.h)
-        if self.food in self.snakes:
-            self._place_food()
+        while True:
+            self.food = self._generate_random_point(self.w, self.h)
+            if self.food not in self.snakes and self.food not in self.obstacles:
+                break
 
     def play_step(self, action: List[int]):
         self.frame_iteration += 1
@@ -83,20 +92,24 @@ class SnakeGameAI:
         # TODO: 무한루프에 빠질 수 있음
         if self.is_collision() or self.frame_iteration > 100 * len(self.snakes):
             game_over = True
-            reward = -10
+            reward = REWARD_GAME_OVER
             return reward, game_over, self.score
 
         # 4. place new food or just move
         if self.head == self.food:
             self.score += 1
-            reward = 10
+            reward = REWARD_EAT_FOOD
             self._place_food()
         else:
+            reward = REWARD_JUST_MOVE
             self.snakes.pop()
 
         # 5. update ui and clock
         self._update_ui()
+        global SPEED #FIXME: 디버그용
         self.clock.tick(SPEED)
+        if self.episode > 200: #FIXME: 디버그용
+            SPEED = 100
 
         # 6. return
         return reward, game_over, self.score
@@ -110,16 +123,35 @@ class SnakeGameAI:
         # hits itself
         if pt in self.snakes[1:]:
             return True
+        # hits obstacles
+        if pt in self.obstacles:
+            return True
 
         return False
 
     def _update_ui(self):
         self.display.fill(BLACK)
 
+        # draw snakes
         for pt in self.snakes:
             pygame.draw.rect(self.display, BLUE2, pygame.Rect(pt.x, pt.y, BLOCK_SIZE, BLOCK_SIZE))
             # pygame.draw.rect(self.display, BLUE2, pygame.Rect(pt.x + 4, pt.y + 4, 12, 12))
+        
+        # draw food
         pygame.draw.rect(self.display, RED, pygame.Rect(self.food.x, self.food.y, BLOCK_SIZE, BLOCK_SIZE))
+        
+        # draw obstacles
+        for pt in self.obstacles:
+            pygame.draw.rect(self.display, GRAY, pygame.Rect(pt.x, pt.y, BLOCK_SIZE, BLOCK_SIZE))
+        
+        # draw head arrow, 머리 방향을 가리키는 직선
+        delta = self.direction_to_delta(self.direction)
+        pygame.draw.line(self.display, WHITE, 
+                         start_pos=(self.head.x + BLOCK_SIZE / 2, self.head.y + BLOCK_SIZE / 2),
+                         end_pos=(self.head.x + BLOCK_SIZE / 2 + delta.x, 
+                                  self.head.y + BLOCK_SIZE / 2 + delta.y),
+                         width=2)
+        
         text = font.render(f"Score: {self.score}", True, WHITE)
         self.display.blit(text, [0, 0])
         pygame.display.flip()
@@ -157,9 +189,9 @@ class SnakeGameAI:
         '''
         랜덤 위치에 장애물을 생성
         생성 시 snake, food와 겹치지 않도록 함
-        매 epoch마다 호출됨
+        매 episode마다 호출됨
         '''
-        self.obstacles = []
+        self.obstacles: List[Point] = []
         for _ in range(num_obstacle):
             while True:
                 obstacle = self._generate_random_point(self.w, self.h)
@@ -178,3 +210,16 @@ class SnakeGameAI:
         x = random.randint(0, (w - BLOCK_SIZE) // BLOCK_SIZE) * BLOCK_SIZE
         y = random.randint(0, (h - BLOCK_SIZE) // BLOCK_SIZE) * BLOCK_SIZE
         return Point(x, y)
+    
+    def direction_to_delta(self, direction: Direction) -> Point:
+        '''
+        direction을 받아서 delta를 리턴
+        '''
+        if direction == Direction.RIGHT:
+            return Point(BLOCK_SIZE, 0)
+        elif direction == Direction.LEFT:
+            return Point(-BLOCK_SIZE, 0)
+        elif direction == Direction.DOWN:
+            return Point(0, BLOCK_SIZE)
+        elif direction == Direction.UP:
+            return Point(0, -BLOCK_SIZE)

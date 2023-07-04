@@ -19,7 +19,7 @@ class Agent:
         self.epsilon = 0  # randomness
         self.gamma = 0.9  # discount rate
         self.memory = deque(maxlen=MAX_MEMORY)
-        self.model = Linear_QNet(11, 256, 3)
+        self.model = Linear_QNet(14, 256, 3) #FIXME: 잠시바꿈
         self.trainer = QTrainer(self.model, lr=LR, gamma=self.gamma)
 
     def get_state(self, game: SnakeGameAI):
@@ -34,6 +34,123 @@ class Agent:
         dir_u = True if game.direction == Direction.UP else False
         dir_d = True if game.direction == Direction.DOWN else False
 
+        #TODO: 나중에 밖으로 빼서 따로 함수 만들자
+        # straight-line obstacle and snake distance
+        dist_straight = None
+        for obs in game.obstacles + game.snakes[1:]:
+            if dir_l:
+                # obs 중에서 head보다 왼쪽에 있는 것들 중에서 가장 가까운 것
+                if obs.x < head.x and obs.y == head.y:
+                    dist_straight = head.x - obs.x
+            elif dir_r:
+                # obs 중에서 head보다 오른쪽에 있는 것들 중에서 가장 가까운 것
+                if obs.x > head.x and obs.y == head.y:
+                    dist_straight = obs.x - head.x
+            elif dir_u:
+                # obs 중에서 head보다 위쪽에 있는 것들 중에서 가장 가까운 것
+                if obs.x == head.x and obs.y < head.y:
+                    dist_straight = head.y - obs.y
+            elif dir_d:
+                # obs 중에서 head보다 아래쪽에 있는 것들 중에서 가장 가까운 것
+                if obs.x == head.x and obs.y > head.y:
+                    dist_straight = obs.y - head.y
+        
+        if dist_straight is None:
+            # head와 벽 끝까지의 거리
+            if dir_l:
+                dist_straight = head.x
+            elif dir_r:
+                dist_straight = game.w - head.x
+            elif dir_u:
+                dist_straight = head.y
+            elif dir_d:
+                dist_straight = game.h - head.y
+            else:
+                assert False, "direction error"
+        
+        # normalize distance
+        if dir_l or dir_u:
+            dist_straight = dist_straight / game.w / BLOCK_SIZE
+        else:
+            dist_straight = dist_straight / game.h / BLOCK_SIZE
+        
+        # right-turn obstacle and snake distance
+        dist_right = None
+        for obs in game.obstacles + game.snakes[1:]:
+            if dir_l:
+                # obs 중에서 head보다 위쪽에 있는 것들 중에서 가장 가까운 것
+                if obs.x == head.x and obs.y < head.y:
+                    dist_right = head.y - obs.y
+            elif dir_r:
+                # obs 중에서 head보다 아래쪽에 있는 것들 중에서 가장 가까운 것
+                if obs.x == head.x and obs.y > head.y:
+                    dist_right = obs.y - head.y
+            elif dir_u:
+                # obs 중에서 head보다 오른쪽에 있는 것들 중에서 가장 가까운 것
+                if obs.x > head.x and obs.y == head.y:
+                    dist_right = obs.x - head.x
+            elif dir_d:
+                # obs 중에서 head보다 왼쪽에 있는 것들 중에서 가장 가까운 것
+                if obs.x < head.x and obs.y == head.y:
+                    dist_right = head.x - obs.x
+        if dist_right is None:
+            # head와 벽 끝까지의 거리
+            if dir_l:
+                dist_right = game.h - head.y
+            elif dir_r:
+                dist_right = head.y
+            elif dir_u:
+                dist_right = head.x
+            elif dir_d:
+                dist_right = game.w - head.x
+            else:
+                assert False, "direction error"
+        
+        # normalize distance
+        if dir_l or dir_d:
+            dist_right = dist_right / game.h / BLOCK_SIZE
+        else:
+            dist_right = dist_right / game.w / BLOCK_SIZE
+        
+        # left-turn obstacle and snake distance
+        dist_left = None
+        for obs in game.obstacles + game.snakes[1:]:
+            if dir_l:
+                # obs 중에서 head보다 아래쪽에 있는 것들 중에서 가장 가까운 것
+                if obs.x == head.x and obs.y > head.y:
+                    dist_left = obs.y - head.y
+            elif dir_r:
+                # obs 중에서 head보다 위쪽에 있는 것들 중에서 가장 가까운 것
+                if obs.x == head.x and obs.y < head.y:
+                    dist_left = head.y - obs.y
+            elif dir_u:
+                # obs 중에서 head보다 왼쪽에 있는 것들 중에서 가장 가까운 것
+                if obs.x < head.x and obs.y == head.y:
+                    dist_left = head.x - obs.x
+            elif dir_d:
+                # obs 중에서 head보다 오른쪽에 있는 것들 중에서 가장 가까운 것
+                if obs.x > head.x and obs.y == head.y:
+                    dist_left = obs.x - head.x
+        if dist_left is None:
+            # head와 벽 끝까지의 거리
+            if dir_l:
+                dist_left = head.y
+            elif dir_r:
+                dist_left = game.h - head.y
+            elif dir_u:
+                dist_left = game.w - head.x
+            elif dir_d:
+                dist_left = head.x
+            else:
+                assert False, "direction error"
+        
+        # normalize distance
+        if dir_l or dir_u:
+            dist_left = dist_left / game.h / BLOCK_SIZE
+        else:
+            dist_left = dist_left / game.w / BLOCK_SIZE
+        
+        
         state = [
             # danger straight
             dir_r and game.is_collision(point_r) or \
@@ -52,6 +169,11 @@ class Agent:
             dir_u and game.is_collision(point_l) or \
             dir_r and game.is_collision(point_u) or \
             dir_l and game.is_collision(point_d),  # 왼쪽으로 가고있는데 아래쪽에 벽이있다? 좌회전 위험.
+
+            # 진행방향에서 head와 장애물간의 거리
+            dist_straight,
+            dist_right,
+            dist_left,
 
             # move direction
             dir_l,
@@ -106,14 +228,14 @@ class Agent:
 
 def train():
     plot_scores = []
-    plot_mean_scores = []
+    plot_recent_mean_scores = []
     total_score = 0
     highest_score = 0
     agent = Agent()
     game = SnakeGameAI()
     
-    for epoch in range(200): # TODO: epoch로 표현하는 것이 옳은가? 우선 이렇게 표현하자.
-        while True:
+    for episode in range(400):
+        while True: # 무한루프이지만, 일정 frame 넘으면 done=True로 바뀜.
             # get old state
             state_old = agent.get_state(game)
 
@@ -147,9 +269,10 @@ def train():
 
         plot_scores.append(score)
         total_score += score
-        mean_score = total_score / agent.n_games
-        plot_mean_scores.append(mean_score)
-        plot(plot_scores, plot_mean_scores)
+        # mean_score = total_score / agent.n_games
+        recent_mean_score = np.mean(plot_scores[-50:])
+        plot_recent_mean_scores.append(recent_mean_score)
+        plot(plot_scores, plot_recent_mean_scores)
 
     # 학습종료
     savefig('Python\\freeCodeCamp\\plot.png')

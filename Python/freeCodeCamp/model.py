@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
+from torch.optim.lr_scheduler import MultiStepLR
 import os
 
 
@@ -32,6 +33,7 @@ class QTrainer:
         self.model = model
         self.optimizer = optim.Adam(model.parameters(), lr=self.lr)
         self.criterion = nn.MSELoss()
+        self.lr_scheduler = MultiStepLR(self.optimizer, milestones=[1000, 2000, 3000], gamma=0.5)
 
     def train_step(self, state, action, reward, next_state, done):
         state = torch.tensor(state, dtype=torch.float)
@@ -69,3 +71,4 @@ class QTrainer:
         loss.backward()  # back propagation and update gradients
 
         self.optimizer.step()
+        self.lr_scheduler.step()
