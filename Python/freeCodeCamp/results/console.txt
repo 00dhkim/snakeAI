@@ -1,0 +1,400 @@
+Game 1 Score 0 Highest Score 0 Epsilon 0.4 Memory Length 15
+Figure(640x480)
+Game 2 Score 0 Highest Score 0 Epsilon 0.395 Memory Length 149
+Figure(640x480)
+Game 3 Score 0 Highest Score 0 Epsilon 0.39 Memory Length 197
+Figure(640x480)
+Game 4 Score 0 Highest Score 0 Epsilon 0.385 Memory Length 255
+Figure(640x480)
+Game 5 Score 0 Highest Score 0 Epsilon 0.38 Memory Length 357
+Figure(640x480)
+Game 6 Score 0 Highest Score 0 Epsilon 0.375 Memory Length 381
+Figure(640x480)
+Game 7 Score 0 Highest Score 0 Epsilon 0.37 Memory Length 546
+Figure(640x480)
+Game 8 Score 0 Highest Score 0 Epsilon 0.365 Memory Length 602
+Figure(640x480)
+Game 9 Score 0 Highest Score 0 Epsilon 0.36 Memory Length 807
+Figure(640x480)
+Game 10 Score 0 Highest Score 0 Epsilon 0.355 Memory Length 850
+Figure(640x480)
+Game 11 Score 0 Highest Score 0 Epsilon 0.35 Memory Length 900
+Figure(640x480)
+Game 12 Score 1 Highest Score 1 Epsilon 0.345 Memory Length 951
+Figure(640x480)
+Game 13 Score 0 Highest Score 1 Epsilon 0.34 Memory Length 1002
+Figure(640x480)
+Game 14 Score 0 Highest Score 1 Epsilon 0.335 Memory Length 1159
+Figure(640x480)
+Game 15 Score 0 Highest Score 1 Epsilon 0.33 Memory Length 1250
+Figure(640x480)
+Game 16 Score 0 Highest Score 1 Epsilon 0.325 Memory Length 1357
+Figure(640x480)
+Game 17 Score 0 Highest Score 1 Epsilon 0.32 Memory Length 1378
+Figure(640x480)
+Game 18 Score 0 Highest Score 1 Epsilon 0.315 Memory Length 1455
+Figure(640x480)
+Game 19 Score 1 Highest Score 1 Epsilon 0.31 Memory Length 1569
+Figure(640x480)
+Game 20 Score 0 Highest Score 1 Epsilon 0.305 Memory Length 1618
+Figure(640x480)
+Game 21 Score 0 Highest Score 1 Epsilon 0.3 Memory Length 1743
+Figure(640x480)
+Game 22 Score 1 Highest Score 1 Epsilon 0.295 Memory Length 1828
+Figure(640x480)
+Game 23 Score 0 Highest Score 1 Epsilon 0.29 Memory Length 1917
+Figure(640x480)
+Game 24 Score 1 Highest Score 1 Epsilon 0.285 Memory Length 2053
+Figure(640x480)
+Game 25 Score 0 Highest Score 1 Epsilon 0.28 Memory Length 2085
+Figure(640x480)
+Game 26 Score 0 Highest Score 1 Epsilon 0.275 Memory Length 2146
+Figure(640x480)
+Game 27 Score 0 Highest Score 1 Epsilon 0.27 Memory Length 2184
+Figure(640x480)
+Game 28 Score 0 Highest Score 1 Epsilon 0.265 Memory Length 2329
+Figure(640x480)
+Game 29 Score 0 Highest Score 1 Epsilon 0.26 Memory Length 2423
+Figure(640x480)
+Game 30 Score 1 Highest Score 1 Epsilon 0.255 Memory Length 2702
+Figure(640x480)
+Game 31 Score 1 Highest Score 1 Epsilon 0.25 Memory Length 2952
+Figure(640x480)
+Game 32 Score 0 Highest Score 1 Epsilon 0.245 Memory Length 3020
+Figure(640x480)
+Game 33 Score 0 Highest Score 1 Epsilon 0.24 Memory Length 3069
+Figure(640x480)
+Game 34 Score 0 Highest Score 1 Epsilon 0.235 Memory Length 3096
+Figure(640x480)
+Game 35 Score 0 Highest Score 1 Epsilon 0.23 Memory Length 3497
+Figure(640x480)
+Game 36 Score 0 Highest Score 1 Epsilon 0.225 Memory Length 3570
+Figure(640x480)
+Game 37 Score 0 Highest Score 1 Epsilon 0.22 Memory Length 3587
+Figure(640x480)
+Game 38 Score 0 Highest Score 1 Epsilon 0.215 Memory Length 3638
+Figure(640x480)
+Game 39 Score 0 Highest Score 1 Epsilon 0.21 Memory Length 3702
+Figure(640x480)
+Game 40 Score 1 Highest Score 1 Epsilon 0.205 Memory Length 4040
+Figure(640x480)
+Game 41 Score 0 Highest Score 1 Epsilon 0.2 Memory Length 4158
+Figure(640x480)
+Game 42 Score 1 Highest Score 1 Epsilon 0.195 Memory Length 4329
+Figure(640x480)
+Game 43 Score 1 Highest Score 1 Epsilon 0.19 Memory Length 4396
+Figure(640x480)
+Game 44 Score 2 Highest Score 2 Epsilon 0.185 Memory Length 4546
+Figure(640x480)
+Game 45 Score 0 Highest Score 2 Epsilon 0.18 Memory Length 4632
+Figure(640x480)
+Game 46 Score 1 Highest Score 2 Epsilon 0.175 Memory Length 4673
+Figure(640x480)
+Game 47 Score 0 Highest Score 2 Epsilon 0.17 Memory Length 4791
+Figure(640x480)
+Game 48 Score 0 Highest Score 2 Epsilon 0.165 Memory Length 4908
+Figure(640x480)
+Game 49 Score 1 Highest Score 2 Epsilon 0.16 Memory Length 5027
+Figure(640x480)
+Game 50 Score 0 Highest Score 2 Epsilon 0.155 Memory Length 5144
+Figure(640x480)
+Game 51 Score 0 Highest Score 2 Epsilon 0.15 Memory Length 5255
+Figure(640x480)
+Game 52 Score 1 Highest Score 2 Epsilon 0.145 Memory Length 5385
+Figure(640x480)
+Game 53 Score 0 Highest Score 2 Epsilon 0.14 Memory Length 5512
+Figure(640x480)
+Game 54 Score 0 Highest Score 2 Epsilon 0.135 Memory Length 5546
+Figure(640x480)
+Game 55 Score 2 Highest Score 2 Epsilon 0.13 Memory Length 5814
+Figure(640x480)
+Game 56 Score 1 Highest Score 2 Epsilon 0.125 Memory Length 5941
+Figure(640x480)
+Game 57 Score 3 Highest Score 3 Epsilon 0.12 Memory Length 6131
+Figure(640x480)
+Game 58 Score 0 Highest Score 3 Epsilon 0.115 Memory Length 6184
+Figure(640x480)
+Game 59 Score 2 Highest Score 3 Epsilon 0.11 Memory Length 6593
+Figure(640x480)
+Game 60 Score 0 Highest Score 3 Epsilon 0.105 Memory Length 6612
+Figure(640x480)
+Game 61 Score 1 Highest Score 3 Epsilon 0.1 Memory Length 6889
+Figure(640x480)
+Game 62 Score 1 Highest Score 3 Epsilon 0.095 Memory Length 7080
+Figure(640x480)
+Game 63 Score 2 Highest Score 3 Epsilon 0.09 Memory Length 7200
+Figure(640x480)
+Game 64 Score 2 Highest Score 3 Epsilon 0.085 Memory Length 7565
+Figure(640x480)
+Game 65 Score 1 Highest Score 3 Epsilon 0.08 Memory Length 7681
+Figure(640x480)
+Game 66 Score 0 Highest Score 3 Epsilon 0.075 Memory Length 8082
+Figure(640x480)
+Game 67 Score 1 Highest Score 3 Epsilon 0.07 Memory Length 8252
+Figure(640x480)
+Game 68 Score 1 Highest Score 3 Epsilon 0.065 Memory Length 8322
+Figure(640x480)
+Game 69 Score 1 Highest Score 3 Epsilon 0.06 Memory Length 8532
+Figure(640x480)
+Game 70 Score 0 Highest Score 3 Epsilon 0.055 Memory Length 8557
+Figure(640x480)
+Game 71 Score 1 Highest Score 3 Epsilon 0.05 Memory Length 8715
+Figure(640x480)
+Game 72 Score 0 Highest Score 3 Epsilon 0.045 Memory Length 8733
+Figure(640x480)
+Game 73 Score 2 Highest Score 3 Epsilon 0.04 Memory Length 8913
+Figure(640x480)
+Game 74 Score 1 Highest Score 3 Epsilon 0.035 Memory Length 9111
+Figure(640x480)
+Game 75 Score 0 Highest Score 3 Epsilon 0.03 Memory Length 9332
+Figure(640x480)
+Game 76 Score 0 Highest Score 3 Epsilon 0.025 Memory Length 9552
+Figure(640x480)
+Game 77 Score 0 Highest Score 3 Epsilon 0.02 Memory Length 9609
+Figure(640x480)
+Game 78 Score 0 Highest Score 3 Epsilon 0.015 Memory Length 9818
+Figure(640x480)
+Game 79 Score 1 Highest Score 3 Epsilon 0.01 Memory Length 10016
+Figure(640x480)
+Game 80 Score 0 Highest Score 3 Epsilon 0.005 Memory Length 10132
+Figure(640x480)
+Game 81 Score 1 Highest Score 3 Epsilon 0.0 Memory Length 10633
+Figure(640x480)
+Game 82 Score 0 Highest Score 3 Epsilon -0.005 Memory Length 11034
+Figure(640x480)
+Game 83 Score 0 Highest Score 3 Epsilon -0.01 Memory Length 11435
+Figure(640x480)
+Game 84 Score 1 Highest Score 3 Epsilon -0.015 Memory Length 11936
+Figure(640x480)
+Game 85 Score 5 Highest Score 5 Epsilon -0.02 Memory Length 12837
+Figure(640x480)
+Game 86 Score 12 Highest Score 12 Epsilon -0.025 Memory Length 14438
+Figure(640x480)
+Game 87 Score 0 Highest Score 12 Epsilon -0.03 Memory Length 14839
+Figure(640x480)
+Game 88 Score 1 Highest Score 12 Epsilon -0.035 Memory Length 15340
+Figure(640x480)
+Game 89 Score 1 Highest Score 12 Epsilon -0.04 Memory Length 15841
+Figure(640x480)
+Game 90 Score 0 Highest Score 12 Epsilon -0.045 Memory Length 16242
+Figure(640x480)
+Game 91 Score 2 Highest Score 12 Epsilon -0.05 Memory Length 16843
+Figure(640x480)
+Game 92 Score 18 Highest Score 18 Epsilon -0.055 Memory Length 17850
+Figure(640x480)
+Game 93 Score 4 Highest Score 18 Epsilon -0.06 Memory Length 18651
+Figure(640x480)
+Game 94 Score 1 Highest Score 18 Epsilon -0.065 Memory Length 19152
+Figure(640x480)
+Game 95 Score 2 Highest Score 18 Epsilon -0.07 Memory Length 19753
+Figure(640x480)
+Game 96 Score 5 Highest Score 18 Epsilon -0.075 Memory Length 20009
+Figure(640x480)
+Game 97 Score 2 Highest Score 18 Epsilon -0.08 Memory Length 20610
+Figure(640x480)
+Game 98 Score 5 Highest Score 18 Epsilon -0.085 Memory Length 21511
+Figure(640x480)
+Game 99 Score 18 Highest Score 18 Epsilon -0.09 Memory Length 22161
+Figure(640x480)
+Game 100 Score 19 Highest Score 19 Epsilon -0.095 Memory Length 24462
+Figure(640x480)
+Game 101 Score 0 Highest Score 19 Epsilon -0.1 Memory Length 24863
+Figure(640x480)
+Game 102 Score 1 Highest Score 19 Epsilon -0.105 Memory Length 25073
+Figure(640x480)
+Game 103 Score 4 Highest Score 19 Epsilon -0.11 Memory Length 25874
+Figure(640x480)
+Game 104 Score 0 Highest Score 19 Epsilon -0.115 Memory Length 26275
+Figure(640x480)
+Game 105 Score 17 Highest Score 19 Epsilon -0.12 Memory Length 28376
+Figure(640x480)
+Game 106 Score 2 Highest Score 19 Epsilon -0.125 Memory Length 28977
+Figure(640x480)
+Game 107 Score 41 Highest Score 41 Epsilon -0.13 Memory Length 30777
+Figure(640x480)
+Game 108 Score 25 Highest Score 41 Epsilon -0.135 Memory Length 31462
+Figure(640x480)
+Game 109 Score 37 Highest Score 41 Epsilon -0.14 Memory Length 32329
+Figure(640x480)
+Game 110 Score 38 Highest Score 41 Epsilon -0.145 Memory Length 33108
+Figure(640x480)
+Game 111 Score 30 Highest Score 41 Epsilon -0.15 Memory Length 33715
+Figure(640x480)
+Game 112 Score 18 Highest Score 41 Epsilon -0.155 Memory Length 34188
+Figure(640x480)
+Game 113 Score 22 Highest Score 41 Epsilon -0.16 Memory Length 34608
+Figure(640x480)
+Game 114 Score 36 Highest Score 41 Epsilon -0.165 Memory Length 35373
+Figure(640x480)
+Game 115 Score 45 Highest Score 45 Epsilon -0.17 Memory Length 36223
+Figure(640x480)
+Game 116 Score 42 Highest Score 45 Epsilon -0.175 Memory Length 37209
+Figure(640x480)
+Game 117 Score 26 Highest Score 45 Epsilon -0.18 Memory Length 37676
+Figure(640x480)
+Game 118 Score 53 Highest Score 53 Epsilon -0.185 Memory Length 38857
+Figure(640x457)
+Game 119 Score 29 Highest Score 53 Epsilon -0.19 Memory Length 39551
+Figure(640x457)
+Game 120 Score 39 Highest Score 53 Epsilon -0.195 Memory Length 40343
+Figure(640x457)
+Game 121 Score 18 Highest Score 53 Epsilon -0.2 Memory Length 40689
+Figure(640x457)
+Game 122 Score 21 Highest Score 53 Epsilon -0.205 Memory Length 41155
+Figure(640x457)
+Game 123 Score 43 Highest Score 53 Epsilon -0.21 Memory Length 41969
+Figure(640x457)
+Game 124 Score 35 Highest Score 53 Epsilon -0.215 Memory Length 42661
+Figure(640x457)
+Game 125 Score 35 Highest Score 53 Epsilon -0.22 Memory Length 43481
+Figure(640x457)
+Game 126 Score 26 Highest Score 53 Epsilon -0.225 Memory Length 43955
+Figure(640x457)
+Game 127 Score 20 Highest Score 53 Epsilon -0.23 Memory Length 44320
+Figure(640x457)
+Game 128 Score 44 Highest Score 53 Epsilon -0.235 Memory Length 45237
+Figure(640x457)
+Game 129 Score 27 Highest Score 53 Epsilon -0.24 Memory Length 45892
+Figure(640x457)
+Game 130 Score 35 Highest Score 53 Epsilon -0.245 Memory Length 46720
+Figure(640x457)
+Game 131 Score 76 Highest Score 76 Epsilon -0.25 Memory Length 48939
+Figure(640x457)
+Game 132 Score 36 Highest Score 76 Epsilon -0.255 Memory Length 49700
+Figure(640x457)
+Game 133 Score 61 Highest Score 76 Epsilon -0.26 Memory Length 50972
+Figure(640x457)
+Game 134 Score 24 Highest Score 76 Epsilon -0.265 Memory Length 51395
+Figure(640x457)
+Game 135 Score 31 Highest Score 76 Epsilon -0.27 Memory Length 52021
+Figure(640x457)
+Game 136 Score 33 Highest Score 76 Epsilon -0.275 Memory Length 52742
+Figure(640x457)
+Game 137 Score 21 Highest Score 76 Epsilon -0.28 Memory Length 53189
+Figure(640x457)
+Game 138 Score 47 Highest Score 76 Epsilon -0.285 Memory Length 54181
+Figure(640x457)
+Game 139 Score 17 Highest Score 76 Epsilon -0.29 Memory Length 54442
+Figure(640x457)
+Game 140 Score 50 Highest Score 76 Epsilon -0.295 Memory Length 55493
+Figure(640x457)
+Game 141 Score 26 Highest Score 76 Epsilon -0.3 Memory Length 56116
+Figure(640x457)
+Game 142 Score 24 Highest Score 76 Epsilon -0.305 Memory Length 56578
+Figure(640x457)
+Game 143 Score 26 Highest Score 76 Epsilon -0.31 Memory Length 57062
+Figure(640x457)
+Game 144 Score 20 Highest Score 76 Epsilon -0.315 Memory Length 57473
+Figure(640x457)
+Game 145 Score 23 Highest Score 76 Epsilon -0.32 Memory Length 58041
+Figure(640x457)
+Game 146 Score 39 Highest Score 76 Epsilon -0.325 Memory Length 58854
+Figure(640x457)
+Game 147 Score 39 Highest Score 76 Epsilon -0.33 Memory Length 59608
+Figure(640x457)
+Game 148 Score 22 Highest Score 76 Epsilon -0.335 Memory Length 59982
+Figure(640x457)
+Game 149 Score 30 Highest Score 76 Epsilon -0.34 Memory Length 60637
+Figure(640x457)
+Game 150 Score 39 Highest Score 76 Epsilon -0.345 Memory Length 61505
+Figure(640x457)
+Game 151 Score 13 Highest Score 76 Epsilon -0.35 Memory Length 61808
+Figure(640x457)
+Game 152 Score 22 Highest Score 76 Epsilon -0.355 Memory Length 62211
+Figure(640x457)
+Game 153 Score 25 Highest Score 76 Epsilon -0.36 Memory Length 62825
+Figure(640x457)
+Game 154 Score 30 Highest Score 76 Epsilon -0.365 Memory Length 63532
+Figure(640x457)
+Game 155 Score 21 Highest Score 76 Epsilon -0.37 Memory Length 63996
+Figure(640x457)
+Game 156 Score 25 Highest Score 76 Epsilon -0.375 Memory Length 64520
+Figure(640x457)
+Game 157 Score 40 Highest Score 76 Epsilon -0.38 Memory Length 65283
+Figure(640x457)
+Game 158 Score 35 Highest Score 76 Epsilon -0.385 Memory Length 65977
+Figure(640x457)
+Game 159 Score 34 Highest Score 76 Epsilon -0.39 Memory Length 66711
+Figure(640x457)
+Game 160 Score 38 Highest Score 76 Epsilon -0.395 Memory Length 67545
+Figure(640x457)
+Game 161 Score 55 Highest Score 76 Epsilon -0.4 Memory Length 68682
+Figure(640x457)
+Game 162 Score 18 Highest Score 76 Epsilon -0.405 Memory Length 69076
+Figure(640x457)
+Game 163 Score 36 Highest Score 76 Epsilon -0.41 Memory Length 69866
+Figure(640x457)
+Game 164 Score 41 Highest Score 76 Epsilon -0.415 Memory Length 70658
+Figure(640x457)
+Game 165 Score 35 Highest Score 76 Epsilon -0.42 Memory Length 71388
+Figure(640x457)
+Game 166 Score 25 Highest Score 76 Epsilon -0.425 Memory Length 71850
+Figure(640x457)
+Game 167 Score 22 Highest Score 76 Epsilon -0.43 Memory Length 72236
+Figure(640x457)
+Game 168 Score 41 Highest Score 76 Epsilon -0.435 Memory Length 73104
+Figure(640x457)
+Game 169 Score 36 Highest Score 76 Epsilon -0.44 Memory Length 73836
+Figure(640x457)
+Game 170 Score 48 Highest Score 76 Epsilon -0.445 Memory Length 74991
+Figure(640x457)
+Game 171 Score 54 Highest Score 76 Epsilon -0.45 Memory Length 76131
+Figure(640x457)
+Game 172 Score 51 Highest Score 76 Epsilon -0.455 Memory Length 77235
+Figure(640x457)
+Game 173 Score 44 Highest Score 76 Epsilon -0.46 Memory Length 78244
+Figure(640x457)
+Game 174 Score 23 Highest Score 76 Epsilon -0.465 Memory Length 78675
+Figure(640x457)
+Game 175 Score 56 Highest Score 76 Epsilon -0.47 Memory Length 79876
+Figure(640x457)
+Game 176 Score 17 Highest Score 76 Epsilon -0.475 Memory Length 80265
+Figure(640x457)
+Game 177 Score 23 Highest Score 76 Epsilon -0.48 Memory Length 80690
+Figure(640x457)
+Game 178 Score 23 Highest Score 76 Epsilon -0.485 Memory Length 81090
+Figure(640x457)
+Game 179 Score 36 Highest Score 76 Epsilon -0.49 Memory Length 81804
+Figure(640x457)
+Game 180 Score 29 Highest Score 76 Epsilon -0.495 Memory Length 82400
+Figure(640x457)
+Game 181 Score 11 Highest Score 76 Epsilon -0.5 Memory Length 82590
+Figure(640x457)
+Game 182 Score 25 Highest Score 76 Epsilon -0.505 Memory Length 83041
+Figure(640x457)
+Game 183 Score 35 Highest Score 76 Epsilon -0.51 Memory Length 83866
+Figure(640x457)
+Game 184 Score 47 Highest Score 76 Epsilon -0.515 Memory Length 84863
+Figure(640x457)
+Game 185 Score 19 Highest Score 76 Epsilon -0.52 Memory Length 85219
+Figure(640x457)
+Game 186 Score 57 Highest Score 76 Epsilon -0.525 Memory Length 86378
+Figure(640x457)
+Game 187 Score 13 Highest Score 76 Epsilon -0.53 Memory Length 86619
+Figure(640x457)
+Game 188 Score 51 Highest Score 76 Epsilon -0.535 Memory Length 87727
+Figure(640x457)
+Game 189 Score 21 Highest Score 76 Epsilon -0.54 Memory Length 88090
+Figure(640x457)
+Game 190 Score 42 Highest Score 76 Epsilon -0.545 Memory Length 88836
+Figure(640x457)
+Game 191 Score 32 Highest Score 76 Epsilon -0.55 Memory Length 89483
+Figure(640x457)
+Game 192 Score 26 Highest Score 76 Epsilon -0.555 Memory Length 90025
+Figure(640x457)
+Game 193 Score 47 Highest Score 76 Epsilon -0.56 Memory Length 91219
+Figure(640x457)
+Game 194 Score 39 Highest Score 76 Epsilon -0.565 Memory Length 92034
+Figure(640x457)
+Game 195 Score 21 Highest Score 76 Epsilon -0.57 Memory Length 92469
+Figure(640x457)
+Game 196 Score 25 Highest Score 76 Epsilon -0.575 Memory Length 92980
+Figure(640x457)
+Game 197 Score 27 Highest Score 76 Epsilon -0.58 Memory Length 93358
+Figure(640x457)
+Game 198 Score 48 Highest Score 76 Epsilon -0.585 Memory Length 94449
+Figure(640x457)
+Game 199 Score 31 Highest Score 76 Epsilon -0.59 Memory Length 95112
+Figure(640x457)
+Game 200 Score 53 Highest Score 76 Epsilon -0.595 Memory Length 96347
+Figure(640x457)

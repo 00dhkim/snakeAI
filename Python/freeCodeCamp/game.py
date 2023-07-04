@@ -6,7 +6,7 @@ import numpy as np
 from typing import List
 
 pygame.init()
-font = pygame.font.Font('arial.ttf', 25)
+font = pygame.font.Font('Python\\freeCodeCamp\\arial.ttf', 25)
 
 
 class Direction(Enum):
@@ -26,7 +26,7 @@ BLUE2 = (0, 100, 255)
 BLACK = (0, 0, 0)
 
 BLOCK_SIZE = 20
-SPEED = 100
+SPEED = 10000 # 숫자가 클수록 빠름. 100이면 관찰하기 적당.
 
 
 class SnakeGameAI:

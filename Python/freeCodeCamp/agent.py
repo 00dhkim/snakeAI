@@ -4,7 +4,7 @@ import numpy as np
 from collections import deque
 from game import SnakeGameAI, Direction, Point
 from model import Linear_QNet, QTrainer
-from helper import plot
+from helper import plot, savefig
 
 MAX_MEMORY = 100_000
 BATCH_SIZE = 1000
@@ -151,6 +151,8 @@ def train():
         plot_mean_scores.append(mean_score)
         plot(plot_scores, plot_mean_scores)
 
+    # 학습종료
+    savefig('Python\\freeCodeCamp\\plot.png')
 
 
 if __name__ == '__main__':

@@ -12,9 +12,14 @@ def plot(scores, mean_scores):
     plt.xlabel('Number of Games')
     plt.ylabel('Score')
     plt.plot(scores)
-    plt.plot(mean_scores)
+    
+    # 마지막 mean_score에 대한 수평선
+    plt.axhline(y=mean_scores[-1], color='r', linestyle='-')
     plt.ylim(ymin=0)
     plt.text(len(scores) - 1, scores[-1], str(scores[-1]))
     plt.text(len(mean_scores) - 1, mean_scores[-1], str(mean_scores[-1]))
     plt.show(block=False)
     plt.pause(.1)
+
+def savefig(filename):
+    plt.savefig(filename)
