@@ -23,7 +23,7 @@ class Agent:
         self.trainer = QTrainer(self.model, lr=LR, gamma=self.gamma)
 
     def get_state(self, game: SnakeGameAI):
-        head = game.snake[0]
+        head = game.snakes[0]
         point_l = Point(head.x - BLOCK_SIZE, head.y)
         point_r = Point(head.x + BLOCK_SIZE, head.y)
         point_u = Point(head.x, head.y - BLOCK_SIZE)
@@ -112,7 +112,7 @@ def train():
     agent = Agent()
     game = SnakeGameAI()
     
-    for _ in range(200):
+    for epoch in range(200): # TODO: epoch로 표현하는 것이 옳은가? 우선 이렇게 표현하자.
         while True:
             # get old state
             state_old = agent.get_state(game)

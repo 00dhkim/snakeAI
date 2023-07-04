@@ -32,12 +32,13 @@ SPEED = 10000 # 숫자가 클수록 빠름. 100이면 관찰하기 적당.
 class SnakeGameAI:
 
     def __init__(self, w=640, h=480):
-        self.direction = None
-        self.head = None
-        self.snake = None
-        self.score = None
-        self.food = None
-        self.frame_iteration = None
+        self.direction = Direction.RIGHT
+        self.head = Point(0, 0)
+        self.snakes = []
+        self.score = 0
+        self.food = Point(0, 0)
+        self.obstacles = []
+        self.frame_iteration = 0
 
         self.w = w
         self.h = h
@@ -51,19 +52,17 @@ class SnakeGameAI:
         # init game state
         self.direction = Direction.RIGHT
         self.head = Point(self.w / 2, self.h / 2)
-        self.snake = [self.head,
+        self.snakes = [self.head,
                       Point(self.head.x - BLOCK_SIZE, self.head.y),
                       Point(self.head.x - 2 * BLOCK_SIZE, self.head.y)]
         self.score = 0
-        self.food = 0
         self._place_food()
+        self._generate_obstacle()
         self.frame_iteration = 0
 
     def _place_food(self):
-        x = random.randint(0, (self.w - BLOCK_SIZE) // BLOCK_SIZE) * BLOCK_SIZE
-        y = random.randint(0, (self.h - BLOCK_SIZE) // BLOCK_SIZE) * BLOCK_SIZE
-        self.food = Point(x, y)
-        if self.food in self.snake:
+        self.food = self._generate_random_point(self.w, self.h)
+        if self.food in self.snakes:
             self._place_food()
 
     def play_step(self, action: List[int]):
@@ -76,13 +75,13 @@ class SnakeGameAI:
 
         # 2. move
         self._move(action)  # update the head
-        self.snake.insert(0, self.head)
+        self.snakes.insert(0, self.head)
 
         # 3. check if game over
         reward = 0
         game_over = False
         # TODO: 무한루프에 빠질 수 있음
-        if self.is_collision() or self.frame_iteration > 100 * len(self.snake):
+        if self.is_collision() or self.frame_iteration > 100 * len(self.snakes):
             game_over = True
             reward = -10
             return reward, game_over, self.score
@@ -93,7 +92,7 @@ class SnakeGameAI:
             reward = 10
             self._place_food()
         else:
-            self.snake.pop()
+            self.snakes.pop()
 
         # 5. update ui and clock
         self._update_ui()
@@ -109,7 +108,7 @@ class SnakeGameAI:
         if pt.x > self.w - BLOCK_SIZE or pt.x < 0 or pt.y > self.h - BLOCK_SIZE or pt.y < 0:
             return True
         # hits itself
-        if pt in self.snake[1:]:
+        if pt in self.snakes[1:]:
             return True
 
         return False
@@ -117,7 +116,7 @@ class SnakeGameAI:
     def _update_ui(self):
         self.display.fill(BLACK)
 
-        for pt in self.snake:
+        for pt in self.snakes:
             pygame.draw.rect(self.display, BLUE2, pygame.Rect(pt.x, pt.y, BLOCK_SIZE, BLOCK_SIZE))
             # pygame.draw.rect(self.display, BLUE2, pygame.Rect(pt.x + 4, pt.y + 4, 12, 12))
         pygame.draw.rect(self.display, RED, pygame.Rect(self.food.x, self.food.y, BLOCK_SIZE, BLOCK_SIZE))
@@ -153,3 +152,29 @@ class SnakeGameAI:
             y -= BLOCK_SIZE
 
         self.head = Point(x, y)
+
+    def _generate_obstacle(self, num_obstacle=1):
+        '''
+        랜덤 위치에 장애물을 생성
+        생성 시 snake, food와 겹치지 않도록 함
+        매 epoch마다 호출됨
+        '''
+        self.obstacles = []
+        for _ in range(num_obstacle):
+            while True:
+                obstacle = self._generate_random_point(self.w, self.h)
+                if obstacle not in self.snakes \
+                    and obstacle != self.food \
+                    and obstacle not in self.obstacles:
+                    
+                    self.obstacles.append(obstacle)
+                    break
+    
+    def _generate_random_point(self, w, h) -> Point:
+        '''
+        랜덤하게 Point 생성 후 리턴
+        포인트 자리가 비었을지 보장하지 않음. (직접 체크해야 함)
+        '''
+        x = random.randint(0, (w - BLOCK_SIZE) // BLOCK_SIZE) * BLOCK_SIZE
+        y = random.randint(0, (h - BLOCK_SIZE) // BLOCK_SIZE) * BLOCK_SIZE
+        return Point(x, y)
