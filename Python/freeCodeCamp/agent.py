@@ -9,6 +9,7 @@ from helper import plot, savefig
 MAX_MEMORY = 100_000
 BATCH_SIZE = 1000
 LR = 0.001
+MINIMUM_GAMMA = 0.05
 
 BLOCK_SIZE = 20
 
@@ -19,7 +20,7 @@ class Agent:
         self.epsilon = 0  # randomness
         self.gamma = 0.9  # discount rate
         self.memory = deque(maxlen=MAX_MEMORY)
-        self.model = Linear_QNet(14, 256, 3) #FIXME: 잠시바꿈
+        self.model = Linear_QNet(14, 256, 3)
         self.trainer = QTrainer(self.model, lr=LR, gamma=self.gamma)
 
     def get_state(self, game: SnakeGameAI):
@@ -34,7 +35,6 @@ class Agent:
         dir_u = True if game.direction == Direction.UP else False
         dir_d = True if game.direction == Direction.DOWN else False
 
-        #TODO: 나중에 밖으로 빼서 따로 함수 만들자
         # straight-line obstacle and snake distance
         dist_straight = None
         for obs in game.obstacles + game.snakes[1:]:
@@ -212,10 +212,10 @@ class Agent:
 
     def get_action(self, state):
         # random moves: tradeoff exploration / exploitation
-        self.epsilon = 80 - self.n_games
+        self.epsilon = max(1 - self.n_games/100, MINIMUM_GAMMA)
         final_move = [0, 0, 0]
-        if random.randint(0, 200) < self.epsilon:
-            move = random.randint(0, 2)  # 0 or 1
+        if random.random() < self.epsilon:
+            move = random.randint(0, 2)  # 0 ~ 2
             final_move[move] = 1
         else:
             state0 = torch.tensor(state, dtype=torch.float)
