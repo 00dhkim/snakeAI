@@ -2,14 +2,14 @@ import torch
 import random
 import numpy as np
 from collections import deque
-from game import SnakeGameAI, Direction, Point
+from game import SnakeGame, Direction, Point
 from model import Linear_QNet, QTrainer
 from helper import plot, savefig
 
 MAX_MEMORY = 100_000
 BATCH_SIZE = 1000
 LR = 0.001
-MINIMUM_GAMMA = 0.05
+MINIMUM_EPSILON = 0.05
 
 BLOCK_SIZE = 20
 
@@ -23,7 +23,7 @@ class Agent:
         self.model = Linear_QNet(14, 256, 3)
         self.trainer = QTrainer(self.model, lr=LR, gamma=self.gamma)
 
-    def get_state(self, game: SnakeGameAI):
+    def get_state(self, game: SnakeGame):
         head = game.snakes[0]
         point_l = Point(head.x - BLOCK_SIZE, head.y)
         point_r = Point(head.x + BLOCK_SIZE, head.y)
@@ -212,7 +212,7 @@ class Agent:
 
     def get_action(self, state):
         # random moves: tradeoff exploration / exploitation
-        self.epsilon = max(1 - self.n_games/100, MINIMUM_GAMMA)
+        self.epsilon = max(0.5 - self.n_games/100, MINIMUM_EPSILON)
         final_move = [0, 0, 0]
         if random.random() < self.epsilon:
             move = random.randint(0, 2)  # 0 ~ 2
@@ -220,7 +220,7 @@ class Agent:
         else:
             state0 = torch.tensor(state, dtype=torch.float)
             prediction = self.model(state0)  # 이렇게 하면 forward 함수가 실행됨
-            move = torch.argmax(prediction).item()
+            move = torch.argmax(prediction)
             final_move[move] = 1
 
         return final_move
@@ -232,9 +232,9 @@ def train():
     total_score = 0
     highest_score = 0
     agent = Agent()
-    game = SnakeGameAI()
+    game = SnakeGame()
     
-    for episode in range(400):
+    for episode in range(1000):
         while True: # 무한루프이지만, 일정 frame 넘으면 done=True로 바뀜.
             # get old state
             state_old = agent.get_state(game)
@@ -266,7 +266,7 @@ def train():
             agent.model.save()
 
         print(f'Game {agent.n_games} Score {score} Highest Score {highest_score}'
-                f' Epsilon {agent.epsilon/200} Memory Length {len(agent.memory)}')
+                f' Epsilon {agent.epsilon} Memory Length {len(agent.memory)}')
 
         plot_scores.append(score)
         total_score += score

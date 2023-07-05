@@ -15,6 +15,7 @@ class Linear_QNet(nn.Module):
     def forward(self, x):
         x = F.relu(self.linear1(x))
         x = self.linear2(x)
+        # x = nn.Softmax(dim=-1)(x)
         return x
 
     def save(self, file_name='model.pth'):
@@ -33,7 +34,7 @@ class QTrainer:
         self.model = model
         self.optimizer = optim.Adam(model.parameters(), lr=self.lr)
         self.criterion = nn.MSELoss()
-        self.lr_scheduler = MultiStepLR(self.optimizer, milestones=[100, 200, 300], gamma=0.5)
+        self.lr_scheduler = MultiStepLR(self.optimizer, milestones=[200, 400, 600], gamma=0.5)
         # self.lr_scheduler = ExponentialLR(self.optimizer, gamma=0.5)
 
     def train_step(self, state, action, reward, next_state, done):
@@ -59,7 +60,7 @@ class QTrainer:
             Q_new = reward[idx]
             if not done[idx]:
                 Q_new = reward[idx] + self.gamma * torch.max(self.model(next_state[idx]))
-
+                # Q_new = reward[idx] * (1 - self.gamma) + self.gamma * torch.max(self.model(next_state[idx])) # step에 따라 예전 reward를 덜 강조.
             target[idx][torch.argmax(action[idx]).item()] = Q_new
 
         # 2: Q_new = r + gamma * max(next_predicted Q value) -> only do this if not done
