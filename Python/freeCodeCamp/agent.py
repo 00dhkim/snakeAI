@@ -259,6 +259,7 @@ def train():
         game.reset()
         agent.n_games += 1
         agent.train_long_memory()
+        agent.trainer.lr_scheduler.step() ## LR 스케줄링
 
         if score > highest_score:
             highest_score = score

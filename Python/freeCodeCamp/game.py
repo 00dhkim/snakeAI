@@ -107,9 +107,10 @@ class SnakeGameAI:
         # 5. update ui and clock
         self._update_ui()
         global SPEED #FIXME: 디버그용
+        SPEED = 500000
         self.clock.tick(SPEED)
-        if self.episode > 200: #FIXME: 디버그용
-            SPEED = 100
+        # if self.episode > 200: #FIXME: 디버그용
+        #     SPEED = 100
 
         # 6. return
         return reward, game_over, self.score
