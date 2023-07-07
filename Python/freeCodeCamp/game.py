@@ -1,7 +1,7 @@
 import pygame
 import numpy as np
 
-from typing import List
+from typing import List, Tuple
 from helper import Direction, Point
 from helper import generate_random_point, direction_converter, direction_to_delta
 
@@ -18,13 +18,13 @@ GRAY = (50, 50, 50)
 YELLOW = (255, 255, 0)
 
 BLOCK_SIZE = 20
-SPEED = 10000 # 숫자가 클수록 빠름. 100이면 관찰하기 적당.
+SPEED = 100 # 숫자가 클수록 빠름. 100이면 관찰하기 적당.
 
 REWARD_GAME_OVER = -10
 REWARD_EAT_FOOD = 10
 REWARD_JUST_MOVE = -0.001
 
-N_ROCKS = 0
+N_ROCKS = 20
 
 class SnakeGame:
 
@@ -56,7 +56,7 @@ class SnakeGame:
                       Point(self.head.x - 2 * BLOCK_SIZE, self.head.y)]
         self.score = 0
         self._place_food()
-        self._generate_rock(N_ROCKS)
+        self._generate_rocks(N_ROCKS)
         self.frame_iteration = 0
         self.episode += 1
 
@@ -111,103 +111,8 @@ class SnakeGame:
         dir_r = True if self.direction == Direction.RIGHT else False
         dir_u = True if self.direction == Direction.UP else False
         dir_d = True if self.direction == Direction.DOWN else False
-
-        # straight-line obstacle and snake distance
-        dist_straight = None
-        for obs in self.obstacles + self.snakes[1:]:
-            if dir_l:
-                # obs 중에서 head보다 왼쪽에 있는 것들 중에서 가장 가까운 것
-                if obs.x < head.x and obs.y == head.y:
-                    dist_straight = head.x - obs.x
-            elif dir_r:
-                # obs 중에서 head보다 오른쪽에 있는 것들 중에서 가장 가까운 것
-                if obs.x > head.x and obs.y == head.y:
-                    dist_straight = obs.x - head.x
-            elif dir_u:
-                # obs 중에서 head보다 위쪽에 있는 것들 중에서 가장 가까운 것
-                if obs.x == head.x and obs.y < head.y:
-                    dist_straight = head.y - obs.y
-            elif dir_d:
-                # obs 중에서 head보다 아래쪽에 있는 것들 중에서 가장 가까운 것
-                if obs.x == head.x and obs.y > head.y:
-                    dist_straight = obs.y - head.y
         
-        if dist_straight is None:
-            # head와 벽 끝까지의 거리
-            if dir_l:
-                dist_straight = head.x
-            elif dir_r:
-                dist_straight = self.w - head.x
-            elif dir_u:
-                dist_straight = head.y
-            elif dir_d:
-                dist_straight = self.h - head.y
-            else:
-                assert False, "direction error"
-        
-        # right-turn obstacle and snake distance
-        dist_right = None
-        for obs in self.obstacles + self.snakes[1:]:
-            if dir_l:
-                # obs 중에서 head보다 위쪽에 있는 것들 중에서 가장 가까운 것
-                if obs.x == head.x and obs.y < head.y:
-                    dist_right = head.y - obs.y
-            elif dir_r:
-                # obs 중에서 head보다 아래쪽에 있는 것들 중에서 가장 가까운 것
-                if obs.x == head.x and obs.y > head.y:
-                    dist_right = obs.y - head.y
-            elif dir_u:
-                # obs 중에서 head보다 오른쪽에 있는 것들 중에서 가장 가까운 것
-                if obs.x > head.x and obs.y == head.y:
-                    dist_right = obs.x - head.x
-            elif dir_d:
-                # obs 중에서 head보다 왼쪽에 있는 것들 중에서 가장 가까운 것
-                if obs.x < head.x and obs.y == head.y:
-                    dist_right = head.x - obs.x
-        if dist_right is None:
-            # head와 벽 끝까지의 거리
-            if dir_l:
-                dist_right = self.h - head.y
-            elif dir_r:
-                dist_right = head.y
-            elif dir_u:
-                dist_right = head.x
-            elif dir_d:
-                dist_right = self.w - head.x
-            else:
-                assert False, "direction error"
-        
-        # left-turn obstacle and snake distance
-        dist_left = None
-        for obs in self.obstacles + self.snakes[1:]:
-            if dir_l:
-                # obs 중에서 head보다 아래쪽에 있는 것들 중에서 가장 가까운 것
-                if obs.x == head.x and obs.y > head.y:
-                    dist_left = obs.y - head.y
-            elif dir_r:
-                # obs 중에서 head보다 위쪽에 있는 것들 중에서 가장 가까운 것
-                if obs.x == head.x and obs.y < head.y:
-                    dist_left = head.y - obs.y
-            elif dir_u:
-                # obs 중에서 head보다 왼쪽에 있는 것들 중에서 가장 가까운 것
-                if obs.x < head.x and obs.y == head.y:
-                    dist_left = head.x - obs.x
-            elif dir_d:
-                # obs 중에서 head보다 오른쪽에 있는 것들 중에서 가장 가까운 것
-                if obs.x > head.x and obs.y == head.y:
-                    dist_left = obs.x - head.x
-        if dist_left is None:
-            # head와 벽 끝까지의 거리
-            if dir_l:
-                dist_left = head.y
-            elif dir_r:
-                dist_left = self.h - head.y
-            elif dir_u:
-                dist_left = self.w - head.x
-            elif dir_d:
-                dist_left = head.x
-            else:
-                assert False, "direction error"
+        dist_straight, dist_right, dist_left = self._get_obstacle_distance()
         
         # normalize distance
         if dir_l or dir_r:
@@ -260,6 +165,117 @@ class SnakeGame:
 
         return np.array(state, dtype=int)
 
+    def _get_obstacle_distance(self) -> Tuple[int, int, int]:
+        '''
+        head와 직진, 우회전, 좌회전 방향에 있는 장애물과의 거리를 구한다.
+        
+        reutrns: (dist_straight, dist_right, dist_left)
+        '''
+        head = self.snakes[0]
+
+        dir_l = True if self.direction == Direction.LEFT else False
+        dir_r = True if self.direction == Direction.RIGHT else False
+        dir_u = True if self.direction == Direction.UP else False
+        dir_d = True if self.direction == Direction.DOWN else False  
+        
+        # straight-line rocks and snake distance
+        dist_straight = 99999
+        for obs in self.rocks + self.snakes[1:]:
+            if dir_l:
+                # obs 중에서 head보다 왼쪽에 있는 것들 중에서 가장 가까운 것
+                if obs.x < head.x and obs.y == head.y and dist_straight > head.x - obs.x:
+                    dist_straight = head.x - obs.x
+            elif dir_r:
+                # obs 중에서 head보다 오른쪽에 있는 것들 중에서 가장 가까운 것
+                if obs.x > head.x and obs.y == head.y and dist_straight > obs.x - head.x:
+                    dist_straight = obs.x - head.x
+            elif dir_u:
+                # obs 중에서 head보다 위쪽에 있는 것들 중에서 가장 가까운 것
+                if obs.x == head.x and obs.y < head.y and dist_straight > head.y - obs.y:
+                    dist_straight = head.y - obs.y
+            elif dir_d:
+                # obs 중에서 head보다 아래쪽에 있는 것들 중에서 가장 가까운 것
+                if obs.x == head.x and obs.y > head.y and dist_straight > obs.y - head.y:
+                    dist_straight = obs.y - head.y
+        if dist_straight  == 99999:
+            # head와 벽 끝까지의 거리
+            if dir_l:
+                dist_straight = head.x + BLOCK_SIZE
+            elif dir_r:
+                dist_straight = self.w - head.x
+            elif dir_u:
+                dist_straight = head.y + BLOCK_SIZE
+            elif dir_d:
+                dist_straight = self.h - head.y
+            else:
+                assert False, "direction error"
+        
+        # right-turn rocks and snake distance
+        dist_right = 99999
+        for obs in self.rocks + self.snakes[1:]:
+            if dir_l:
+                # obs 중에서 head보다 위쪽에 있는 것들 중에서 가장 가까운 것
+                if obs.x == head.x and obs.y < head.y and dist_right > head.y - obs.y:
+                    dist_right = head.y - obs.y
+            elif dir_r:
+                # obs 중에서 head보다 아래쪽에 있는 것들 중에서 가장 가까운 것
+                if obs.x == head.x and obs.y > head.y and dist_right > obs.y - head.y:
+                    dist_right = obs.y - head.y
+            elif dir_u:
+                # obs 중에서 head보다 오른쪽에 있는 것들 중에서 가장 가까운 것
+                if obs.x > head.x and obs.y == head.y and dist_right > obs.x - head.x:
+                    dist_right = obs.x - head.x
+            elif dir_d:
+                # obs 중에서 head보다 왼쪽에 있는 것들 중에서 가장 가까운 것
+                if obs.x < head.x and obs.y == head.y and dist_right > head.x - obs.x:
+                    dist_right = head.x - obs.x
+        if dist_right == 99999:
+            # head와 벽 끝까지의 거리
+            if dir_l:
+                dist_right = head.y + BLOCK_SIZE
+            elif dir_r:
+                dist_right = self.h - head.y
+            elif dir_u:
+                dist_right = self.w - head.x
+            elif dir_d:
+                dist_right = head.x + BLOCK_SIZE
+            else:
+                assert False, "direction error"
+        
+        # left-turn rocks and snake distance
+        dist_left = 99999
+        for obs in self.rocks + self.snakes[1:]:
+            if dir_l:
+                # obs 중에서 head보다 아래쪽에 있는 것들 중에서 가장 가까운 것
+                if obs.x == head.x and obs.y > head.y and dist_left > obs.y - head.y:
+                    dist_left = obs.y - head.y
+            elif dir_r:
+                # obs 중에서 head보다 위쪽에 있는 것들 중에서 가장 가까운 것
+                if obs.x == head.x and obs.y < head.y and dist_left > head.y - obs.y:
+                    dist_left = head.y - obs.y
+            elif dir_u:
+                # obs 중에서 head보다 왼쪽에 있는 것들 중에서 가장 가까운 것
+                if obs.x < head.x and obs.y == head.y and dist_left > head.x - obs.x:
+                    dist_left = head.x - obs.x
+            elif dir_d:
+                # obs 중에서 head보다 오른쪽에 있는 것들 중에서 가장 가까운 것
+                if obs.x > head.x and obs.y == head.y and dist_left > obs.x - head.x:
+                    dist_left = obs.x - head.x
+        if dist_left == 99999:
+            # head와 벽 끝까지의 거리
+            if dir_l:
+                dist_left = self.h - head.y
+            elif dir_r:
+                dist_left = head.y + BLOCK_SIZE
+            elif dir_u:
+                dist_left = head.x + BLOCK_SIZE
+            elif dir_d:
+                dist_left = self.w - head.x
+            else:
+                assert False, "direction error"
+        
+        return dist_straight, dist_right, dist_left
+
     def _is_collision(self, pt=None):
         if pt is None:
             pt = self.head
@@ -291,15 +307,42 @@ class SnakeGame:
             pygame.draw.rect(self.display, GRAY, pygame.Rect(pt.x, pt.y, BLOCK_SIZE, BLOCK_SIZE))
         
         # draw head arrow, 머리 방향을 가리키는 직선
-        delta = direction_to_delta(self.direction)
-        pygame.draw.line(self.display, WHITE, 
-                         start_pos=(self.head.x + BLOCK_SIZE / 2, self.head.y + BLOCK_SIZE / 2),
-                         end_pos=(self.head.x + BLOCK_SIZE / 2 + delta.x, 
-                                  self.head.y + BLOCK_SIZE / 2 + delta.y),
-                         width=2)
+        # pygame.draw.line(self.display, WHITE, 
+        #                  start_pos=(self.head.x + BLOCK_SIZE / 2, self.head.y + BLOCK_SIZE / 2),
+        #                  end_pos=(self.head.x + BLOCK_SIZE / 2 + delta.x * BLOCK_SIZE, 
+        #                           self.head.y + BLOCK_SIZE / 2 + delta.y * BLOCK_SIZE),
+        #                  width=2)
         
         text = font.render(f"Score: {self.score}", True, WHITE)
         self.display.blit(text, [0, 0])
+        pygame.display.flip()
+        
+        delta = direction_to_delta(self.direction)
+        dist_straight, dist_right, dist_left = self._get_obstacle_distance()
+        dist_straight -= BLOCK_SIZE
+        dist_right -= BLOCK_SIZE
+        dist_left -= BLOCK_SIZE
+        
+        # draw straight line, 머리부터 직진방향으로 장애물(맵 끝, 돌, 뱀)까지의 직선
+        pygame.draw.line(self.display, (255,128,128),
+                         start_pos=(self.head.x + BLOCK_SIZE / 2, self.head.y + BLOCK_SIZE / 2),
+                         end_pos=(self.head.x + BLOCK_SIZE / 2 + delta.x * dist_straight,
+                                  self.head.y + BLOCK_SIZE / 2 + delta.y * dist_straight),
+                         width=1)
+        
+        # draw right line, 머리부터 우회전방향으로 장애물(맵 끝, 돌, 뱀)까지의 직선
+        pygame.draw.line(self.display, (128,255,128),
+                         start_pos=(self.head.x + BLOCK_SIZE / 2, self.head.y + BLOCK_SIZE / 2),
+                         end_pos=(self.head.x + BLOCK_SIZE / 2 - delta.y * dist_right,
+                                 self.head.y + BLOCK_SIZE / 2 + delta.x * dist_right),
+                         width=1)
+        
+        # draw left line, 머리부터 좌회전방향으로 장애물(맵 끝, 돌, 뱀)까지의 직선
+        pygame.draw.line(self.display, (128,128,255),
+                         start_pos=(self.head.x + BLOCK_SIZE / 2, self.head.y + BLOCK_SIZE / 2),
+                         end_pos=(self.head.x + BLOCK_SIZE / 2 + delta.y * dist_left,
+                                  self.head.y + BLOCK_SIZE / 2 - delta.x * dist_left),
+                         width=1)
         pygame.display.flip()
 
     def _place_food(self):
@@ -331,7 +374,7 @@ class SnakeGame:
         생성 시 snake, food와 겹치지 않도록 함
         매 episode마다 호출됨
         '''
-        self.obstacles: List[Point] = []
+        self.rocks: List[Point] = []
         for _ in range(num_rocks):
             while True:
                 rock = generate_random_point(self.w, self.h)

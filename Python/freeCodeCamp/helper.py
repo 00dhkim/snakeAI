@@ -74,13 +74,13 @@ def generate_random_point(w, h) -> Point:
 def direction_to_delta(direction: Direction) -> Point:
     '''
     direction을 받아서 진행 방향을 의미하는 Point 방향벡터를 리턴.
-    벡터의 크기는 BLOCK_SIZE
+    벡터의 크기는 1
     '''
     if direction == Direction.RIGHT:
-        return Point(BLOCK_SIZE, 0)
+        return Point(1, 0)
     elif direction == Direction.LEFT:
-        return Point(-BLOCK_SIZE, 0)
+        return Point(-1, 0)
     elif direction == Direction.DOWN:
-        return Point(0, BLOCK_SIZE)
+        return Point(0, 1)
     elif direction == Direction.UP:
-        return Point(0, -BLOCK_SIZE)
+        return Point(0, -1)
