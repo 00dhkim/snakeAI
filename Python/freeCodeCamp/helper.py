@@ -24,17 +24,6 @@ ACTION_STRAIGHT = [1, 0, 0]
 ACTION_RIGHT = [0, 1, 0]
 ACTION_LEFT = [0, 0, 1]
 
-# RGB colors
-WHITE = (255, 255, 255)
-RED = (200, 0, 0)
-BLUE1 = (0, 0, 255)
-BLUE2 = (0, 100, 255)
-BLACK = (0, 0, 0)
-GRAY = (50, 50, 50)
-YELLOW = (255, 255, 0)
-
-SPEED = 10000 # 숫자가 클수록 빠름. 100이면 관찰하기 적당.
-
 plt.ion()
 
 def plot(scores, mean_scores):
@@ -84,7 +73,8 @@ def generate_random_point(w, h) -> Point:
 
 def direction_to_delta(direction: Direction) -> Point:
     '''
-    direction을 받아서 진행 방향을 의미하는 Point 방향벡터를 리턴
+    direction을 받아서 진행 방향을 의미하는 Point 방향벡터를 리턴.
+    벡터의 크기는 BLOCK_SIZE
     '''
     if direction == Direction.RIGHT:
         return Point(BLOCK_SIZE, 0)
@@ -94,49 +84,3 @@ def direction_to_delta(direction: Direction) -> Point:
         return Point(0, BLOCK_SIZE)
     elif direction == Direction.UP:
         return Point(0, -BLOCK_SIZE)
-
-# 직선을 그리려면 agent.py의 state에 있는 dist_straight, dist_right, dist_left가 필요함.
-# 즉, agent.py의 Agent 클래스와 game.py의 SnakeGameAI 클래스 모두에 의존해야 함.
-# 그런데 game.py에서는 ui.py의 UI 클래스의 update_ui 함수를 호출해야 함.
-class UI:
-    def __init__(self, w, h):
-        self.w = w
-        self.h = h
-        pygame.init()
-        self.font = pygame.font.SysFont('arial', 25)
-        self.display = pygame.display.set_mode((self.w, self.h))
-        pygame.display.set_caption("Snake")
-        self.clock = pygame.time.Clock()
-    
-    def update(self, snakes, head, food, obstacles, direction, score):
-        # collect user input
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                quit()
-        
-        self.display.fill(BLACK)
-        
-        # draw snakes
-        for pt in snakes:
-            pygame.draw.rect(self.display, BLUE2, pygame.Rect(pt.x, pt.y, BLOCK_SIZE, BLOCK_SIZE))
-        
-        # draw food
-        pygame.draw.rect(self.display, RED, pygame.Rect(food.x, food.y, BLOCK_SIZE, BLOCK_SIZE))
-        
-        # draw obstacles
-        for pt in obstacles:
-            pygame.draw.rect(self.display, GRAY, pygame.Rect(pt.x, pt.y, BLOCK_SIZE, BLOCK_SIZE))
-        
-        # draw head arrow, 머리 방향을 가리키는 직선
-        delta = direction_to_delta(direction)
-        pygame.draw.line(self.display, YELLOW, 
-                         start_pos=(head.x + BLOCK_SIZE / 2, head.y + BLOCK_SIZE / 2),
-                         end_pos=(head.x + BLOCK_SIZE / 2 + delta.x, 
-                                  head.y + BLOCK_SIZE / 2 + delta.y),
-                         width=2)
-        
-        text = self.font.render(f"Score: {score}", True, WHITE)
-        self.display.blit(text, [0, 0])
-        pygame.display.flip()
-        self.clock.tick(SPEED)
