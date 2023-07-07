@@ -9,7 +9,7 @@ from helper import plot, savefig
 MAX_MEMORY = 100_000
 BATCH_SIZE = 1000
 LR = 0.001
-MINIMUM_EPSILON = 0.05
+MINIMUM_EPSILON = 0.00
 
 BLOCK_SIZE = 20
 
