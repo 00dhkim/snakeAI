@@ -79,6 +79,7 @@ class SnakeGame:
         if self._is_collision() or self.frame_iteration > 100 * len(self.snakes):
             game_over = True
             reward = REWARD_GAME_OVER
+            self._update_ui_gameover()
             return reward, game_over, self.score
 
         # 4. place new food or just move
@@ -281,13 +282,13 @@ class SnakeGame:
             pt = self.head
         # hits boundary
         if pt.x > self.w - BLOCK_SIZE or pt.x < 0 or pt.y > self.h - BLOCK_SIZE or pt.y < 0:
-            return True
+            return 1
         # hits itself
         if pt in self.snakes[1:]:
-            return True
+            return 2
         # hits rock
         if pt in self.rocks:
-            return True
+            return 3
 
         return False
 
@@ -343,6 +344,23 @@ class SnakeGame:
                          end_pos=(self.head.x + BLOCK_SIZE / 2 + delta.y * dist_left,
                                   self.head.y + BLOCK_SIZE / 2 - delta.x * dist_left),
                          width=1)
+        pygame.display.flip()
+
+    def _update_ui_gameover(self):
+        '''
+        게임오버 이유를 화면에 표시.
+        다음 게임이 시작되기 전까지, 짧은 학습시간동안 화면에 나타난다
+        '''
+        r = self._is_collision()
+        if r == 1:
+            text = font.render(f"Game Over: Hit the Wall", True, WHITE)
+        elif r == 2:
+            text = font.render(f"Game Over: Hit Yourself", True, WHITE)
+        elif r == 3:
+            text = font.render(f"Game Over: Hit the Rock", True, WHITE)
+        else:
+            text = font.render(f"Game Over: Timeout", True, WHITE)
+        self.display.blit(text, [self.w / 2 - 100, self.h / 2])
         pygame.display.flip()
 
     def _place_food(self):
