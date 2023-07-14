@@ -3,7 +3,7 @@ import random
 import numpy as np
 from collections import deque
 from game import SnakeGame, Direction, Point
-from model import Linear_QNet, QTrainer
+from model import Linear_QNet, QTrainer, Linear_QNet2
 from helper import plot, savefig
 
 MAX_MEMORY = 100_000
@@ -19,13 +19,18 @@ BLOCK_SIZE = 20
 - 가로 길이는 w, 세로 길이는 h
 - x는 오른쪽, y는 아래쪽으로 갈수록 증가
 
-+---------- w
++---------- w [j]
 |0         
 |          
 |        →x
 |    ↓     
 |    y     
-h
+h [i]
+
+e.g.,
+Point(x, y)
+Point(j, i)
+Point(w, h)
 '''
 
 class Agent:
@@ -34,7 +39,8 @@ class Agent:
         self.epsilon = 0  # randomness
         self.gamma = 0.9  # discount rate
         self.memory = deque(maxlen=MAX_MEMORY)
-        self.model = Linear_QNet(14, 256, 3)
+        # self.model = Linear_QNet(11+50, 256, 3) #TODO: input_size: state + window
+        self.model = Linear_QNet2(11, 256, 3) # input_size: state + window
         self.trainer = QTrainer(self.model, lr=LR, gamma=self.gamma)
 
     def remember(self, state, action, reward, next_state, done):
@@ -55,11 +61,11 @@ class Agent:
         #     self.trainer.train_step(state, action, reward, next_state, done)
 
     def train_short_memory(self, state, action, reward, next_state, done):
-        self.trainer.train_step(state, action, reward, next_state, done)
+        self.trainer.train_step(np.array(state), action, reward, next_state, done)
 
     def get_action(self, state):
         # random moves: tradeoff exploration / exploitation
-        self.epsilon = max(0.5 - self.n_games/100, MINIMUM_EPSILON)
+        self.epsilon = max(0.5 - self.n_games/200, MINIMUM_EPSILON)
         final_move = [0, 0, 0]
         if random.random() < self.epsilon:
             move = random.randint(0, 2)  # 0 ~ 2
@@ -112,8 +118,10 @@ def train():
             highest_score = score
             agent.model.save()
 
-        print(f'Game {agent.n_games} Score {score} Highest Score {highest_score}'
-                f' Epsilon {agent.epsilon} Memory Length {len(agent.memory)}')
+        lr = agent.trainer.lr_scheduler.get_last_lr()
+        print(f'Game {agent.n_games:3} Score {score:2} Highest Score {highest_score:2}'
+              f' Epsilon {agent.epsilon:4} Memory Length {len(agent.memory):6}'
+              f' LR {lr}')
 
         plot_scores.append(score)
         total_score += score
