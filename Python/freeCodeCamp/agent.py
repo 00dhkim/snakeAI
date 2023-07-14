@@ -61,7 +61,7 @@ class Agent:
         #     self.trainer.train_step(state, action, reward, next_state, done)
 
     def train_short_memory(self, state, action, reward, next_state, done):
-        self.trainer.train_step(np.array(state), action, reward, next_state, done)
+        self.trainer.train_step(state, action, reward, next_state, done)
 
     def get_action(self, state):
         # random moves: tradeoff exploration / exploitation
