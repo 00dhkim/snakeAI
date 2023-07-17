@@ -40,7 +40,8 @@ class Linear_QNet2(nn.Module):
         self.linear1 = nn.Linear(11, hidden_size)
         self.linear2 = nn.Linear(hidden_size, hidden_size)
         self.cnn1 = nn.Conv2d(2, 64, 3, padding=1)
-        self.cnn2 = nn.Conv2d(64, 2, 3, padding=1)
+        self.cnn2 = nn.Conv2d(64, 64, 3, padding=1)
+        self.cnn3 = nn.Conv2d(64, 2, 3, padding=1)
         
         self.decoder1 = nn.Linear(50+hidden_size, hidden_size)
         self.decoder2 = nn.Linear(hidden_size, output_size)
@@ -53,10 +54,11 @@ class Linear_QNet2(nn.Module):
         x2 = torch.stack(torch.split(x2, 2, dim=-1), dim=-1).view(-1, 2, 5, 5) # 뒷 50개 window
         
         x1 = F.relu(self.linear1(x1))
-        # x1 = F.relu(self.linear2(x1))
+        x1 = self.linear2(x1)
         
         x2_ = F.relu(self.cnn1(x2))
-        x2_ = self.cnn2(x2_)
+        x2_ = F.relu(self.cnn2(x2_))
+        x2_ = self.cnn3(x2_)
         x2_ += x2
         x2_ = nn.Flatten()(x2_)
         
@@ -65,7 +67,7 @@ class Linear_QNet2(nn.Module):
         
         x = torch.cat((x1, x2_), dim=-1)
         x = F.relu(self.decoder1(x))
-        x = (self.decoder2(x))
+        x = self.decoder2(x)
         return x
 
     def save(self, file_name='model.pth'):
