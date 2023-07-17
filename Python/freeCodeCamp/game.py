@@ -19,11 +19,12 @@ GRAY = (50, 50, 50)
 YELLOW = (255, 255, 0)
 
 BLOCK_SIZE = 20
-SPEED = 1000 # 숫자가 클수록 빠름. 100이면 관찰하기 적당.
+SPEED = 10000 # 숫자가 클수록 빠름. 100이면 관찰하기 적당.
 
-REWARD_GAME_OVER = -10
-REWARD_EAT_FOOD = 10
+REWARD_GAME_OVER = -1
+REWARD_EAT_FOOD = 1
 REWARD_JUST_MOVE = -0.001
+# REWARD_JUST_MOVE = 0
 
 N_ROCKS = 0
 
@@ -93,8 +94,8 @@ class SnakeGame:
             self.snakes.pop()
 
         # 5. update ui and clock
-        # self._update_ui() #FIXME:
-        # self.clock.tick(self.ui_speed) #FIXME:
+        self._update_ui() #FIXME:
+        self.clock.tick(self.ui_speed) #FIXME:
         # if self.episode > 200:
             # self.ui_speed = 100
         
@@ -464,7 +465,7 @@ class SnakeGame:
                 if pt.x > self.w - BLOCK_SIZE or pt.x < 0 or pt.y > self.h - BLOCK_SIZE or pt.y < 0:
                     window += [0, 1]
                 elif pt in self.snakes:
-                    window += [1, 0]
+                    window += [0, 1]
                 elif pt in self.rocks:
                     window += [0, 1]
                 elif pt == self.food:

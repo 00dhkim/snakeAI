@@ -37,31 +37,35 @@ class Linear_QNet2(nn.Module):
     '''
     def __init__(self, input_size, hidden_size, output_size):
         super().__init__()
-        self.linear1 = nn.Linear(input_size, hidden_size)
+        self.linear1 = nn.Linear(11, hidden_size)
         self.linear2 = nn.Linear(hidden_size, hidden_size)
         self.cnn1 = nn.Conv2d(2, 64, 3, padding=1)
-        self.cnn2 = nn.Conv2d(64, 1, 3, padding=1)
+        self.cnn2 = nn.Conv2d(64, 2, 3, padding=1)
         
-        self.decoder1 = nn.Linear(25+hidden_size, hidden_size)
+        self.decoder1 = nn.Linear(50+hidden_size, hidden_size)
         self.decoder2 = nn.Linear(hidden_size, output_size)
 
     def forward(self, x):
-        x = x.view(1, 61) #FIXME: 여기서 에러남. train_long_memory 함수로 들어오는 경우, batch가 64이기에 x는 [1, 61]이 아닌 [64, 61]이다. 즉, [1, 61]과 [64, 61]을 모두 받아들일 수 있는 코드가 되어야 한다.
+        x = x.view(-1, 61) #FIXME: 여기서 에러남. train_long_memory 함수로 들어오는 경우, batch가 64이기에 x는 [1, 61]이 아닌 [64, 61]이다. 즉, [1, 61]과 [64, 61]을 모두 받아들일 수 있는 코드가 되어야 한다.
         x1 = x[:, :-50] # 앞 11개 state
-        x2 = torch.tensor(x[:, -50:]).view(1, 2, 5, 5) # 뒷 50개 window
+        # x2 = torch.tensor(x[:, -50:]).view(-1, 2, 5, 5) # 뒷 50개 window
+        x2 = torch.tensor(x[:, -50:]) # 뒷 50개 window
+        x2 = torch.stack(torch.split(x2, 2, dim=-1), dim=-1).view(-1, 2, 5, 5) # 뒷 50개 window
         
         x1 = F.relu(self.linear1(x1))
-        x1 = F.relu(self.linear2(x1))
-        x1 = x1.view(-1)
+        # x1 = F.relu(self.linear2(x1))
         
-        x2 = x2.view(1, 2, 5, 5)
-        x2 = F.relu(self.cnn1(x2))
-        x2 = F.relu(self.cnn2(x2))
-        x2 = x2.view(-1)
+        x2_ = F.relu(self.cnn1(x2))
+        x2_ = self.cnn2(x2_)
+        x2_ += x2
+        x2_ = nn.Flatten()(x2_)
         
-        x = torch.cat((x1, x2), dim=-1)
+        # x1 = (x1 - x1.mean()) / (x1.std() + 1e-8)
+        # x2 = (x2 - x2.mean()) / (x2.std() + 1e-8)
+        
+        x = torch.cat((x1, x2_), dim=-1)
         x = F.relu(self.decoder1(x))
-        x = F.relu(self.decoder2(x))
+        x = (self.decoder2(x))
         return x
 
     def save(self, file_name='model.pth'):
@@ -79,7 +83,7 @@ class QTrainer:
         self.model = model
         self.optimizer = optim.Adam(model.parameters(), lr=self.lr)
         self.criterion = nn.MSELoss()
-        self.lr_scheduler = MultiStepLR(self.optimizer, milestones=[200, 400, 600], gamma=0.5)
+        self.lr_scheduler = MultiStepLR(self.optimizer, milestones=[100, 200, 300, 400, 500, 600], gamma=0.5)
         # self.lr_scheduler = ExponentialLR(self.optimizer, gamma=0.5)
 
     def train_step(self, state, action, reward, next_state, done):

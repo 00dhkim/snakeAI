@@ -40,7 +40,7 @@ class Agent:
         self.gamma = 0.9  # discount rate
         self.memory = deque(maxlen=MAX_MEMORY)
         # self.model = Linear_QNet(11+50, 256, 3) #TODO: input_size: state + window
-        self.model = Linear_QNet2(11, 256, 3) # input_size: state + window
+        self.model = Linear_QNet2(0, 256, 3) # input_size: state + window
         self.trainer = QTrainer(self.model, lr=LR, gamma=self.gamma)
 
     def remember(self, state, action, reward, next_state, done):
@@ -61,11 +61,13 @@ class Agent:
         #     self.trainer.train_step(state, action, reward, next_state, done)
 
     def train_short_memory(self, state, action, reward, next_state, done):
+        # pass
         self.trainer.train_step(state, action, reward, next_state, done)
 
     def get_action(self, state):
         # random moves: tradeoff exploration / exploitation
-        self.epsilon = max(0.5 - self.n_games/200, MINIMUM_EPSILON)
+        # self.epsilon = max(0.5 - self.n_games/200, MINIMUM_EPSILON)
+        self.epsilon = max(0.5 - self.n_games/500, MINIMUM_EPSILON)
         final_move = [0, 0, 0]
         if random.random() < self.epsilon:
             move = random.randint(0, 2)  # 0 ~ 2
@@ -87,7 +89,7 @@ def train():
     agent = Agent()
     game = SnakeGame()
     
-    for episode in range(1000):
+    for episode in range(2000):
         while True: # 무한루프이지만, 일정 frame 넘으면 done=True로 바뀜.
             # get old state
             state_old = game.get_state()
