@@ -94,8 +94,8 @@ class SnakeGame:
             self.snakes.pop()
 
         # 5. update ui and clock
-        self._update_ui() #FIXME:
-        self.clock.tick(self.ui_speed) #FIXME:
+        self._update_ui()
+        self.clock.tick(self.ui_speed)
         # if self.episode > 200:
             # self.ui_speed = 100
         

@@ -47,7 +47,7 @@ class Linear_QNet2(nn.Module):
         self.decoder2 = nn.Linear(hidden_size, output_size)
 
     def forward(self, x):
-        x = x.view(-1, 61) #FIXME: 여기서 에러남. train_long_memory 함수로 들어오는 경우, batch가 64이기에 x는 [1, 61]이 아닌 [64, 61]이다. 즉, [1, 61]과 [64, 61]을 모두 받아들일 수 있는 코드가 되어야 한다.
+        x = x.view(-1, 61)
         x1 = x[:, :-50] # 앞 11개 state
         # x2 = torch.tensor(x[:, -50:]).view(-1, 2, 5, 5) # 뒷 50개 window
         x2 = torch.tensor(x[:, -50:]) # 뒷 50개 window
