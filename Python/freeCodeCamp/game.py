@@ -148,25 +148,20 @@ class SnakeGame:
             dir_r and self._is_collision(point_u) or \
             dir_l and self._is_collision(point_d),  # 왼쪽으로 가고있는데 아래쪽에 벽이있다? 좌회전 위험.
 
-            # # state[3:6] 진행방향에서 head와 장애물간의 거리(정규화되어있음, 0~1)
-            # dist_straight,
-            # dist_right,
-            # dist_left,
-
-            # state[6:10] move direction
+            # state[3:7] move direction
             dir_l,
             dir_r,
             dir_u,
             dir_d,
 
-            # state[10:14] food location
+            # state[7:11] food location
             self.food.x < self.head.x,  # food left
             self.food.x > self.head.x,  # food right
             self.food.y < self.head.y,  # food up
             self.food.y > self.head.y  # food down
         ]
         
-        window = self._get_window2(self.head, window_size=5) # length: 50
+        window = self._get_window(self.head, window_size=5) # length: 50
         # window = np.array(window, dtype=np.float32) / 4 # window 정규화할 필요 없음 (2bit로 표현되어있음)
 
         return np.concatenate((state, window))
@@ -329,32 +324,32 @@ class SnakeGame:
         dist_right -= BLOCK_SIZE
         dist_left -= BLOCK_SIZE
         
-        # draw straight line, 머리부터 직진방향으로 장애물(맵 끝, 돌, 뱀)까지의 직선
-        pygame.draw.line(self.display, (255,128,128),
-                         start_pos=(self.head.x + BLOCK_SIZE / 2, self.head.y + BLOCK_SIZE / 2),
-                         end_pos=(self.head.x + BLOCK_SIZE / 2 + delta.x * dist_straight,
-                                  self.head.y + BLOCK_SIZE / 2 + delta.y * dist_straight),
-                         width=1)
+        # # draw straight line, 머리부터 직진방향으로 장애물(맵 끝, 돌, 뱀)까지의 직선
+        # pygame.draw.line(self.display, (255,128,128),
+        #                  start_pos=(self.head.x + BLOCK_SIZE / 2, self.head.y + BLOCK_SIZE / 2),
+        #                  end_pos=(self.head.x + BLOCK_SIZE / 2 + delta.x * dist_straight,
+        #                           self.head.y + BLOCK_SIZE / 2 + delta.y * dist_straight),
+        #                  width=1)
         
-        # draw right line, 머리부터 우회전방향으로 장애물(맵 끝, 돌, 뱀)까지의 직선
-        pygame.draw.line(self.display, (128,255,128),
-                         start_pos=(self.head.x + BLOCK_SIZE / 2, self.head.y + BLOCK_SIZE / 2),
-                         end_pos=(self.head.x + BLOCK_SIZE / 2 - delta.y * dist_right,
-                                 self.head.y + BLOCK_SIZE / 2 + delta.x * dist_right),
-                         width=1)
+        # # draw right line, 머리부터 우회전방향으로 장애물(맵 끝, 돌, 뱀)까지의 직선
+        # pygame.draw.line(self.display, (128,255,128),
+        #                  start_pos=(self.head.x + BLOCK_SIZE / 2, self.head.y + BLOCK_SIZE / 2),
+        #                  end_pos=(self.head.x + BLOCK_SIZE / 2 - delta.y * dist_right,
+        #                          self.head.y + BLOCK_SIZE / 2 + delta.x * dist_right),
+        #                  width=1)
         
-        # draw left line, 머리부터 좌회전방향으로 장애물(맵 끝, 돌, 뱀)까지의 직선
-        pygame.draw.line(self.display, (128,128,255),
-                         start_pos=(self.head.x + BLOCK_SIZE / 2, self.head.y + BLOCK_SIZE / 2),
-                         end_pos=(self.head.x + BLOCK_SIZE / 2 + delta.y * dist_left,
-                                  self.head.y + BLOCK_SIZE / 2 - delta.x * dist_left),
-                         width=1)
+        # # draw left line, 머리부터 좌회전방향으로 장애물(맵 끝, 돌, 뱀)까지의 직선
+        # pygame.draw.line(self.display, (128,128,255),
+        #                  start_pos=(self.head.x + BLOCK_SIZE / 2, self.head.y + BLOCK_SIZE / 2),
+        #                  end_pos=(self.head.x + BLOCK_SIZE / 2 + delta.y * dist_left,
+        #                           self.head.y + BLOCK_SIZE / 2 - delta.x * dist_left),
+        #                  width=1)
         
         # draw window, 5x5 크기의 흰색 박스 생성, 각 칸마다 window 리스트의 값을 텍스트로 표시
         pygame.draw.rect(self.display, WHITE, 
             pygame.Rect(self.head.x - 2 * BLOCK_SIZE, self.head.y - 2 * BLOCK_SIZE, 5 * BLOCK_SIZE, 5 * BLOCK_SIZE),
             width=1)
-        window = self._get_window(self.head, window_size=5)
+        window = self._get_window_str(self.head, window_size=5)
         for i in range(5):
             for j in range(5):
                 text = fontSmall.render(f"{window[i*5+j]}", True, WHITE)
@@ -419,58 +414,45 @@ class SnakeGame:
                     self.rocks.append(rock)
                     break
 
+    def _get_window_str(self, head: Point, window_size: int = 5) \
+        -> List[str]:
+        '''
+        head를 중심으로 window_size만큼의 사각형 영역을 구하고,
+        그 영역에 있는 snake, rock, food를 1차원 배열로 반환한다. (가로로 먼저, 마치 글 읽듯이)
+        '''
+        window = []
+        for i in range(-window_size//2 + 1, window_size//2 + 1): # -2, -1, 0, 1, 2
+            for j in range(-window_size//2 + 1, window_size//2 + 1): # -2, -1, 0, 1, 2
+                pt = Point(head.x + j * BLOCK_SIZE, head.y + i * BLOCK_SIZE)
+                if self._is_collision(pt):
+                    window.append('o')
+                elif pt == self.head:
+                    window.append('o')
+                elif pt == self.food:
+                    window.append('f')
+                else:
+                    window.append('-')
+        return window
+
     def _get_window(self, head: Point, window_size: int = 5) \
         -> List[int]:
         '''
         head를 중심으로 window_size만큼의 사각형 영역을 구하고,
         그 영역에 있는 snake, rock, food를 1차원 배열로 반환한다. (가로로 먼저, 마치 글 읽듯이)
-        - 0: empty
-        - 1: boundary
-        - 2: snake
-        - 3: rock
-        - 4: food
+        - [0, 0]: empty
+        - [0, 1]: obstacle(boundary, snake, rock)
+        - [1, 0]: food
         '''
         window = []
         for i in range(-window_size//2 + 1, window_size//2 + 1): # -2, -1, 0, 1, 2
             for j in range(-window_size//2 + 1, window_size//2 + 1): # -2, -1, 0, 1, 2
                 pt = Point(head.x + j * BLOCK_SIZE, head.y + i * BLOCK_SIZE)
-                if pt.x > self.w - BLOCK_SIZE or pt.x < 0 or pt.y > self.h - BLOCK_SIZE or pt.y < 0:
-                    window.append(1)
-                elif pt in self.snakes:
-                    window.append(2)
-                elif pt in self.rocks:
-                    window.append(3)
-                elif pt == self.food:
-                    window.append(4)
-                else:
-                    window.append(0)
-        
-        return window
-
-    def _get_window2(self, head: Point, window_size: int = 5) \
-        -> List[int]:
-        '''
-        head를 중심으로 window_size만큼의 사각형 영역을 구하고,
-        그 영역에 있는 snake, rock, food를 1차원 배열로 반환한다. (가로로 먼저, 마치 글 읽듯이)
-        - 0: empty
-        - 1: boundary
-        - 2: snake
-        - 3: rock
-        - 4: food
-        '''
-        window = []
-        for i in range(-window_size//2 + 1, window_size//2 + 1): # -2, -1, 0, 1, 2
-            for j in range(-window_size//2 + 1, window_size//2 + 1): # -2, -1, 0, 1, 2
-                pt = Point(head.x + j * BLOCK_SIZE, head.y + i * BLOCK_SIZE)
-                if pt.x > self.w - BLOCK_SIZE or pt.x < 0 or pt.y > self.h - BLOCK_SIZE or pt.y < 0:
+                if self._is_collision(pt):
                     window += [0, 1]
-                elif pt in self.snakes:
-                    window += [0, 1]
-                elif pt in self.rocks:
+                elif pt == self.head:
                     window += [0, 1]
                 elif pt == self.food:
                     window += [1, 0]
                 else:
                     window += [0, 0]
-        
         return window

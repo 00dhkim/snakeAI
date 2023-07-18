@@ -11,16 +11,11 @@ class Linear_QNet(nn.Module):
     def __init__(self, input_size, hidden_size, output_size):
         super().__init__()
         self.linear1 = nn.Linear(input_size, hidden_size)
-        # self.linear11 = nn.Linear(hidden_size, hidden_size)
-        # self.linear12 = nn.Linear(hidden_size, hidden_size)
         self.linear2 = nn.Linear(hidden_size, output_size)
 
     def forward(self, x):
         x = F.relu(self.linear1(x))
-        # x = F.relu(self.linear11(x))
-        # x = F.relu(self.linear12(x))
         x = self.linear2(x)
-        # x = nn.Softmax(dim=-1)(x)
         return x
 
     def save(self, file_name='model.pth'):
@@ -31,13 +26,14 @@ class Linear_QNet(nn.Module):
         file_name = os.path.join(model_folder_path, file_name)
         torch.save(self.state_dict(), file_name)
 
-class Linear_QNet2(nn.Module):
+class LinearRes_QNet(nn.Module):
     '''
     길이 11의 state는 mlp, 길이 50의 window는 cnn으로 처리 후 concat
     '''
-    def __init__(self, input_size, hidden_size, output_size):
+    def __init__(self, state_size, hidden_size, output_size):
+        # window size: 2x5x5 고정!
         super().__init__()
-        self.linear1 = nn.Linear(11, hidden_size)
+        self.linear1 = nn.Linear(state_size, hidden_size)
         self.linear2 = nn.Linear(hidden_size, hidden_size)
         self.cnn1 = nn.Conv2d(2, 64, 3, padding=1)
         self.cnn2 = nn.Conv2d(64, 64, 3, padding=1)
@@ -49,9 +45,12 @@ class Linear_QNet2(nn.Module):
     def forward(self, x):
         x = x.view(-1, 61)
         x1 = x[:, :-50] # 앞 11개 state
-        # x2 = torch.tensor(x[:, -50:]).view(-1, 2, 5, 5) # 뒷 50개 window
         x2 = torch.tensor(x[:, -50:]) # 뒷 50개 window
-        x2 = torch.stack(torch.split(x2, 2, dim=-1), dim=-1).view(-1, 2, 5, 5) # 뒷 50개 window
+        
+        # x2의 모양은 다음과 같음: [(0,0), (0,1), ..., (0,4), (1,0), ..., (4,4)]
+        # 그렇기에 2개씩 split한 후, stack으로 쌓아서 2x5x5로 만들어줌
+        x2 = torch.stack(torch.split(x2, 2, dim=-1), dim=-1).view(-1, 2, 5, 5)
+        # x2.shape: (batch_size, 2, 5, 5)
         
         x1 = F.relu(self.linear1(x1))
         x1 = self.linear2(x1)
@@ -104,10 +103,6 @@ class QTrainer:
             done = (done, )  # 한개짜리 tuple
 
         # 1: predicted Q values with current state
-        # window = state[-50:] #TODO:
-        # window = np.array(window).view((1, 2, 5, 5))#TODO:
-        # state = state[:-50]#TODO:
-        
         pred = self.model(state)
 
         target = pred.clone()
