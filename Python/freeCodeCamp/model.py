@@ -30,13 +30,14 @@ class LinearRes_QNet(nn.Module):
     '''
     길이 11의 state는 mlp, 길이 50의 window는 cnn으로 처리 후 concat
     '''
+
     def __init__(self, state_size, hidden_size, output_size):
         # window size: 2x5x5 고정!
         super().__init__()
         self.linear1 = nn.Linear(state_size, hidden_size)
         self.linear2 = nn.Linear(hidden_size, hidden_size)
         self.cnn1 = nn.Conv2d(2, 64, 3, padding=1)
-        self.cnn2 = nn.Conv2d(64, 64, 3, padding=1)
+        # self.cnn2 = nn.Conv2d(64, 64, 3, padding=1) # 무거워서 제거. 학습 너무 오래걸림.
         self.cnn3 = nn.Conv2d(64, 2, 3, padding=1)
         
         self.decoder1 = nn.Linear(50+hidden_size, hidden_size)
@@ -56,7 +57,7 @@ class LinearRes_QNet(nn.Module):
         x1 = self.linear2(x1)
         
         x2_ = F.relu(self.cnn1(x2))
-        x2_ = F.relu(self.cnn2(x2_))
+        # x2_ = F.relu(self.cnn2(x2_)) # 무거워서 제거. 학습 너무 오래걸림.
         x2_ = self.cnn3(x2_)
         x2_ += x2
         x2_ = nn.Flatten()(x2_)

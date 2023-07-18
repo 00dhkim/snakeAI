@@ -39,7 +39,7 @@ class Agent:
         self.epsilon = 0  # randomness
         self.gamma = 0.9  # discount rate
         self.memory = deque(maxlen=MAX_MEMORY)
-        # self.model = Linear_QNet(11+50, 256, 3) #TODO: input_size: state + window
+        # self.model = Linear_QNet(11+50, 256, 3) # input_size: state + window
         self.model = LinearRes_QNet(11, 256, 3)
         self.trainer = QTrainer(self.model, lr=LR, gamma=self.gamma)
 
@@ -118,7 +118,7 @@ def train():
 
         if score > highest_score:
             highest_score = score
-            agent.model.save()
+            # agent.model.save() #TODO: 나중에 주석제거
 
         lr = agent.trainer.lr_scheduler.get_last_lr()
         print(f'Game {agent.n_games:3} Score {score:2} Highest Score {highest_score:2}'

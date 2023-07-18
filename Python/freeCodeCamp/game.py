@@ -77,7 +77,6 @@ class SnakeGame:
         # 3. check if game over
         reward = 0
         game_over = False
-        # TODO: 무한루프에 빠질 수 있음
         if self._is_collision() or self.frame_iteration > 100 * len(self.snakes):
             game_over = True
             reward = REWARD_GAME_OVER
